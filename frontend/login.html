@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>تسجيل الدخول — أكاديمية منير</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/mounir_theme.css?v=20261028_v1">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/popup.js?v=20261028_v1"></script>
+    <script src="js/supabase_client.js?v=20261028_v1"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8fafc;
+            font-family: 'Tajawal', sans-serif;
+            color: #142d4e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mn-auth-container {
+            width: 100%;
+            max-width: 440px;
+            padding: 24px 20px;
+            margin: auto;
+        }
+        .mn-auth-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 28px;
+            padding: 32px 24px;
+            box-shadow: 0 10px 40px rgba(20, 45, 78, 0.08);
+            position: relative;
+        }
+        .mn-role-tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 4px;
+            gap: 4px;
+            margin-bottom: 24px;
+        }
+        .mn-role-tab {
+            flex: 1;
+            min-height: 48px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #64748b;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mn-role-tab.active {
+            background: #ffffff;
+            color: #142d4e;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .mn-login-field-wrap {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+        .mn-login-field-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 800;
+            color: #142d4e;
+            margin-bottom: 6px;
+        }
+        .mn-login-input-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .mn-login-input {
+            width: 100%;
+            min-height: 52px;
+            padding: 12px 16px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #142d4e;
+            background: #ffffff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .mn-login-input:focus {
+            border-color: #047857;
+            box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12);
+        }
+        .mn-pw-toggle {
+            position: absolute;
+            left: 12px;
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+        }
+        .mn-pw-toggle:hover { color: #142d4e; }
+        .mn-login-help-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            font-size: 13px;
+        }
+        .mn-text-link {
+            color: #047857;
+            text-decoration: none;
+            font-weight: 700;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 6px 0;
+        }
+        .mn-text-link:hover { text-decoration: underline; }
+        .mn-login-btn {
+            width: 100%;
+            min-height: 52px;
+            background: linear-gradient(135deg, #1F274B 0%, #142d4e 100%);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 800;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(20, 45, 78, 0.2);
+            transition: transform 0.15s, opacity 0.2s;
+        }
+        .mn-login-btn:active { transform: scale(0.98); }
+        .mn-login-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+        .mn-alert-banner {
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            display: none;
+        }
+        .mn-alert-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+        .mn-alert-info {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="mn-auth-container">
+    <div class="mn-auth-card">
+        <!-- Brand Header (Clickable logo) -->
+        <div style="display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom:24px;">
+            <a href="login.html" style="display:inline-block; text-decoration:none;" title="الرئيسية — أكاديمية منير">
+                <img src="images/favicon.png" alt="شعار أكاديمية منير" style="width:58px; height:58px; object-fit:contain; border-radius:14px; margin-bottom:10px;">
+            </a>
+            <h1 style="font-size:22px; font-weight:900; color:#142d4e; margin:0;">أكاديمية منير</h1>
+            <p style="font-size:13px; color:#64748b; margin:4px 0 0; font-weight:600;">بوابة التعلّم الذكية والقرآن الكريم</p>
+        </div>
+
+        <!-- Role Selector -->
+        <div class="mn-role-tabs" role="tablist">
+            <button type="button" class="mn-role-tab active" id="tabStudent" onclick="setRole('student')">
+                بوابة الطالب وولي الأمر
+            </button>
+            <button type="button" class="mn-role-tab" id="tabTeacher" onclick="setRole('teacher')">
+                بوابة المعلم
+            </button>
+        </div>
+
+        <!-- Alert Notification Box -->
+        <div id="loginAlert" class="mn-alert-banner mn-alert-error"></div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)" autocomplete="off">
+            <!-- Username Input -->
+            <div class="mn-login-field-wrap">
+                <label class="mn-login-field-label" for="loginUsername" id="usernameLabel">اسم المستخدم</label>
+                <div class="mn-login-input-box">
+                    <input 
+                        type="text" 
+                        id="loginUsername" 
+                        class="mn-login-input" 
+                        placeholder="أدخل اسم المستخدم أو كود الطالب (مثال: ST0001)" 
+                        dir="auto" 
+                        autocapitalize="none" 
+                        spellcheck="false" 
+                        required
+                    >
+                </div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="mn-login-field-wrap">
+                <label class="mn-login-field-label" for="loginPassword">كلمة المرور</label>
+                <div class="mn-login-input-box">
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        class="mn-login-input" 
+                        placeholder="أدخل كلمة المرور" 
+                        required
+                    >
+                    <button type="button" id="btnTogglePassword" class="mn-pw-toggle" onclick="togglePasswordVisibility()">إظهار</button>
+                </div>
+            </div>
+
+            <!-- Help Links Row -->
+            <div class="mn-login-help-row">
+                <button type="button" class="mn-text-link" onclick="openLoginHelpModal()">نسيت بيانات الدخول؟</button>
+                <button type="button" class="mn-text-link" onclick="openSupportModal()" style="color:#64748b;">المساعدة وتذاكر الدعم</button>
+            </div>
+
+            <!-- Primary Action Button -->
+            <button type="submit" id="submitBtn" class="mn-login-btn">
+                <span>تسجيل الدخول</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px; height:20px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+        </form>
+
+        <div style="margin-top:24px; text-align:center; padding-top:18px; border-top:1px solid #f1f5f9;">
+            <p style="font-size:12px; color:#64748b; margin:0;">
+                أول مرة في الأكاديمية؟ <a href="javascript:void(0)" onclick="openLoginHelpModal()" style="color:#047857; font-weight:800; text-decoration:none;">احصل على بيانات طفلك</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: المساعدة في تسجيل الدخول -->
+<div id="loginHelpModal" class="mn-modal-backdrop" style="display:none;" onclick="if(event.target===this) closeLoginHelpModal()">
+    <div class="mn-modal-card" style="position:relative;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h2 style="font-size:18px; font-weight:800; color:#142d4e; margin:0;">المساعدة في تسجيل الدخول</h2>
+            <button onclick="closeLoginHelpModal()" style="background:#f1f5f9; border:none; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer;">✕</button>
+        </div>
+        <p style="font-size:13px; color:#475569; line-height:1.6; margin-bottom:18px;">
+            يتم إرسال كود الطالب وكلمة المرور تلقائياً عبر رسالة واتساب لولي الأمر عند تأكيد الاشتراك. إذا نسيت الكود أو كلمة المرور، يمكنك استعادته فوراً عبر الدعم.
+        </p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <a href="https://wa.me/201090898873?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%AD%D8%AA%D8%A7%D8%AC%20%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D8%A9%20%D9%81%D9%8A%20%D8%A7%D8%B3%D8%AA%D8%B9%D8%A7%D8%AF%D8%A9%20%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%20%D8%AF%D8%AE%D9%88%D9%84%20%D8%A7%D9%84%D8%B7%D8%A7%D9%84%D8%A8" target="_blank" rel="noopener noreferrer" class="mn-primary" style="text-decoration:none;">
+                <span>التواصل عبر واتساب الأكاديمية</span>
+            </a>
+            <button type="button" onclick="closeLoginHelpModal(); openSupportModal();" class="mn-list-button" style="justify-content:center; font-weight:800; color:#142d4e;">
+                <span>فتح تذكرة مساعدة فورية</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: المساعدة وتذاكر الدعم -->
+<div id="supportModal" class="mn-modal-backdrop" style="display:none;" onclick="if(event.target===this) closeSupportModal()">
+    <div class="mn-modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h2 style="font-size:18px; font-weight:800; color:#142d4e; margin:0;">المساعدة وتذاكر الدعم</h2>
+            <button onclick="closeSupportModal()" style="background:#f1f5f9; border:none; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer;">✕</button>
+        </div>
+        <form id="supportForm" onsubmit="handleSupportSubmit(event)" style="display:flex; flex-direction:column; gap:12px;">
+            <div class="mn-field">
+                <label>نوع الطلب</label>
+                <select id="supportType" class="mn-input">
+                    <option value="login_issue">مشكلة في تسجيل الدخول أو كلمة المرور</option>
+                    <option value="data_edit">طلب تعديل بيانات الطالب أو ولي الأمر</option>
+                    <option value="renewal_inquiry">استفسار عن الشحن والتجديد</option>
+                    <option value="general">استفسار عام أو مقترح</option>
+                </select>
+            </div>
+            <div class="mn-field">
+                <label>اسم الطالب أو رقم الهاتف</label>
+                <input type="text" id="supportContact" class="mn-input" placeholder="اكتب اسم الطالب ورقم الواتساب" required>
+            </div>
+            <div class="mn-field">
+                <label>تفاصيل الطلب</label>
+                <textarea id="supportDetails" class="mn-input" style="height:90px; resize:none;" placeholder="اكتب تفاصيل طلبك هنا..." required></textarea>
+            </div>
+            <button type="submit" id="btnSendSupport" class="mn-primary" style="margin-top:6px;">
+                <span>إرسال التذكرة للإشراف</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentRole = 'student';
+
+    function setRole(role) {
+        currentRole = role;
+        const tabStudent = document.getElementById('tabStudent');
+        const tabTeacher = document.getElementById('tabTeacher');
+        const usernameInput = document.getElementById('loginUsername');
+
+        if (role === 'student') {
+            tabStudent.classList.add('active');
+            tabTeacher.classList.remove('active');
+            usernameInput.placeholder = 'أدخل اسم المستخدم أو كود الطالب (مثال: ST0001)';
+        } else {
+            tabTeacher.classList.add('active');
+            tabStudent.classList.remove('active');
+            usernameInput.placeholder = 'أدخل اسم مستخدم المعلم';
+        }
+    }
+
+    function togglePasswordVisibility() {
+        const pw = document.getElementById('loginPassword');
+        const btn = document.getElementById('btnTogglePassword');
+        if (pw.type === 'password') {
+            pw.type = 'text';
+            btn.innerText = 'إخفاء';
+        } else {
+            pw.type = 'password';
+            btn.innerText = 'إظهار';
+        }
+    }
+
+    function showAlert(msg, isError = true) {
+        const box = document.getElementById('loginAlert');
+        box.innerText = msg;
+        box.style.display = 'block';
+        box.className = 'mn-alert-banner ' + (isError ? 'mn-alert-error' : 'mn-alert-info');
+    }
+
+    function openLoginHelpModal() {
+        document.getElementById('loginHelpModal').style.display = 'flex';
+    }
+    function closeLoginHelpModal() {
+        document.getElementById('loginHelpModal').style.display = 'none';
+    }
+
+    function openSupportModal() {
+        document.getElementById('supportModal').style.display = 'flex';
+    }
+    function closeSupportModal() {
+        document.getElementById('supportModal').style.display = 'none';
+    }
+
+    async function handleSupportSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSendSupport');
+        btn.disabled = true;
+        btn.innerText = 'جاري الإرسال...';
+        
+        const type = document.getElementById('supportType').value;
+        const contact = document.getElementById('supportContact').value;
+        const details = document.getElementById('supportDetails').value;
+
+        try {
+            if (window.MonirDB && window.MonirDB.client) {
+                await window.MonirDB.client.from('support_tickets').insert([{
+                    student_id: null,
+                    category: type,
+                    subject: 'طلب دعم وتسجيل دخول: ' + contact,
+                    message: details,
+                    status: 'open',
+                    priority: 'medium',
+                    created_at: new Date().toISOString()
+                }]);
+            }
+        } catch(err) {
+            console.warn('Support insert error:', err);
+        }
+
+        btn.disabled = false;
+        btn.innerText = 'إرسال التذكرة للإشراف';
+        closeSupportModal();
+        if (window.MonirPopup && window.MonirPopup.alert) {
+            window.MonirPopup.alert('تم إرسال تذكرتك بنجاح ✓ - سيتواصل معك فريق الإشراف والدعم عبر الواتساب في أقرب وقت.', 'تم الإرسال');
+        } else {
+            alert('تم استلام تذكرتك بنجاح، سيتواصل معك فريق الدعم قريباً.');
+        }
+    }
+
+    async function handleLoginSubmit(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        const submitBtn = document.getElementById('submitBtn');
+        const alertBox = document.getElementById('loginAlert');
+        alertBox.style.display = 'none';
+
+        if (!username || !password) {
+            showAlert('يرجى كتابة اسم المستخدم وكلمة المرور.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>جاري التحقق والدخول...</span>';
+
+        try {
+            // Check Supabase Cloud first
+            if (window.MonirDB && window.MonirDB.isConfigured()) {
+                const sbRes = await window.MonirDB.login(username, password, currentRole);
+                if (sbRes && sbRes.success && sbRes.user) {
+                    let userObj = { ...sbRes.user };
+                    if (sbRes.student) {
+                        userObj.student_id = sbRes.student.id || userObj.student_id;
+                        userObj.related_id = sbRes.student.id || userObj.related_id;
+                        userObj.student_code = sbRes.student.student_code || userObj.username;
+                        userObj.parent_name = sbRes.student.parent_name;
+                        userObj.parent_phone = sbRes.student.parent_phone || sbRes.student.phone;
+                        userObj.phone = sbRes.student.phone;
+                        userObj.age = sbRes.student.age;
+                        userObj.group_id = sbRes.student.qr_code || sbRes.student.group_id;
+                        userObj.status = sbRes.student.status;
+                    }
+                    proceedSuccess(userObj, sbRes.token);
+                    return;
+                }
+            }
+
+            // Fallback to Backend API or Mock
+            const resp = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, role: currentRole })
+            });
+
+            if (resp.ok) {
+                const data = await resp.json();
+                proceedSuccess(data.user, data.token);
+            } else {
+                const errData = await resp.json().catch(() => ({}));
+                showAlert(errData.detail || 'اسم المستخدم أو كلمة المرور غير صحيحة. يرجى التأكد وإعادة المحاولة.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>تسجيل الدخول</span>';
+            }
+        } catch(err) {
+            console.warn('Network error, attempting offline mock:', err);
+            if (window.MonirMock) {
+                const mRes = window.MonirMock.login(username, password, currentRole);
+                if (mRes.success) {
+                    proceedSuccess(mRes.user, mRes.token);
+                    return;
+                }
+            }
+            showAlert('تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت وإعادة المحاولة.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>تسجيل الدخول</span>';
+        }
+    }
+
+    function proceedSuccess(user, token) {
+        localStorage.setItem('monir_current_user', JSON.stringify(user));
+        if (token) localStorage.setItem('monir_auth_token', token);
+
+        if (user.role === 'admin') {
+            localStorage.setItem('monir_admin_session_epoch', '20261025_session_v2');
+            window.location.href = 'admin.html';
+        } else if (user.role === 'teacher') {
+            window.location.href = 'teacher.html';
+        } else {
+            window.location.href = 'student.html';
+        }
+    }
+</script>
+
+</body>
+</html>

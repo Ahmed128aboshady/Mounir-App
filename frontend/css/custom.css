@@ -1,0 +1,721 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+
+:root {
+    --primary: #41519C;
+    --primary-dark: #2D396E;
+    --primary-light: #5A6AB5;
+    --primary-soft: #EEF2FF;
+    --secondary: #57BA9E;
+    --secondary-dark: #43A68A;
+    --secondary-light: #E8F8F4;
+    --accent: #57BA9E;
+    --danger: #EF4444;
+    --success: #57BA9E;
+    --dark: #1F274B;
+    --card-bg: #FFFFFF;
+    --bg-main: #F8FAFC;
+    --border: #E2E8F0;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Cairo', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: #1E293B;
+    min-height: 100vh;
+}
+
+/* Brand Utility Classes */
+.bg-brand-primary { background-color: var(--primary) !important; }
+.bg-brand-primary-dark { background-color: var(--primary-dark) !important; }
+.bg-brand-primary-soft { background-color: var(--primary-soft) !important; }
+.hover\:bg-brand-primary-dark:hover { background-color: var(--primary-dark) !important; }
+
+.text-brand-primary { color: var(--primary) !important; }
+.border-brand-primary { border-color: var(--primary) !important; }
+
+.bg-brand-secondary { background-color: var(--secondary) !important; }
+.bg-brand-secondary-dark { background-color: var(--secondary-dark) !important; }
+.bg-brand-secondary-soft { background-color: var(--secondary-light) !important; }
+.hover\:bg-brand-secondary-dark:hover { background-color: var(--secondary-dark) !important; }
+
+.text-brand-secondary { color: #236E58 !important; }
+.border-brand-secondary { border-color: var(--secondary) !important; }
+
+/* Header Brand Logo */
+.header-logo-img {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* Glassmorphism & Cards */
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+}
+
+.student-id-card {
+    background: linear-gradient(135deg, #41519C 0%, #1F274B 100%);
+    color: #FFFFFF;
+    border-radius: 24px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 15px 35px -5px rgba(65, 81, 156, 0.35);
+}
+
+.student-id-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(87, 186, 158, 0.28) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+/* Lecture Card States */
+.lecture-card {
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: #FFFFFF;
+    padding: 18px;
+    transition: all 0.2s ease;
+}
+
+.lecture-card.unlocked {
+    border-color: #BBE7DC;
+    box-shadow: 0 4px 12px rgba(87, 186, 158, 0.1);
+}
+
+.lecture-card.locked {
+    background: #F1F5F9;
+    border-color: #CBD5E1;
+    opacity: 0.75;
+}
+
+.lecture-card.live-now {
+    border: 2px solid #57BA9E;
+    background: #E8F8F4;
+    animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+    0% { box-shadow: 0 0 0 0 rgba(87, 186, 158, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(87, 186, 158, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(87, 186, 158, 0); }
+}
+
+/* Badges */
+.badge-status {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-live { background: #E8F8F4; color: #206E58; }
+.badge-completed { background: #EEF2FF; color: #41519C; }
+.badge-postponed { background: #FEF3C7; color: #B45309; }
+.badge-locked { background: #E2E8F0; color: #475569; }
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999 !important;
+    padding: 16px;
+}
+
+/* Mobile Responsiveness & Viewport Protection */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+}
+
+.safe-bottom {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.safe-top {
+    padding-top: env(safe-area-inset-top, 0px) !important;
+}
+
+@media (max-width: 640px) {
+    .max-w-6xl {
+        width: 100% !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    /* Mobile Sheet Modals */
+    .modal-overlay {
+        padding: 0 !important;
+        align-items: flex-end !important;
+        z-index: 9999 !important;
+    }
+
+    .modal-overlay > div {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-top-left-radius: 1.5rem !important;
+        border-top-right-radius: 1.5rem !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 92vh !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 1.25rem !important;
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25) !important;
+    }
+
+    /* Student Smart ID Card mobile ergonomics */
+    .student-id-card {
+        padding: 16px !important;
+        border-radius: 20px !important;
+    }
+
+    /* Prevent annoying auto-zoom on iOS Safari when focusing input fields */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+
+    /* Mobile Lecture Card buttons */
+    .lecture-card {
+        padding: 14px !important;
+        border-radius: 16px !important;
+    }
+
+    /* Mobile touch target minimum height */
+    button, a.button {
+        min-height: 38px;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════════ */
+/* Modern EdTech Profile Layout (Reference: New folder 63)           */
+/* ══════════════════════════════════════════════════════════════════ */
+.profile-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+}
+
+.profile-cover {
+    height: 125px;
+    background: linear-gradient(135deg, #152238 0%, #1F274B 50%, #2D396E 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 20px 32px;
+}
+
+.profile-cover::before, .profile-cover::after {
+    content: "";
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border: 1px solid rgba(87, 186, 158, 0.22);
+    border-radius: 50%;
+    left: -70px;
+    top: -220px;
+    pointer-events: none;
+}
+
+.profile-cover::after {
+    width: 500px;
+    height: 500px;
+    left: -120px;
+    top: -270px;
+    border-color: rgba(255, 255, 255, 0.07);
+}
+
+.profile-cover-text {
+    position: relative;
+    z-index: 1;
+    color: #e2e8f0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.profile-body {
+    padding: 0 28px 20px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 92px;
+    height: 92px;
+    border: 5px solid white;
+    border-radius: 50%;
+    background: #edf6f2;
+    color: #1F274B;
+    display: grid;
+    place-items: center;
+    font-size: 26px;
+    font-weight: 800;
+    margin-top: -46px;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px -2px rgba(31, 39, 75, 0.15);
+}
+
+.verified-badge {
+    background: #e6f4dd;
+    color: #436836;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.profile-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 22px;
+    padding: 0 24px;
+    border-top: 1px solid var(--border);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    cursor: grab;
+}
+
+.profile-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.horizontal-scroll-row,
+#trackSwitcherTabsRow {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+}
+
+.horizontal-scroll-row::-webkit-scrollbar,
+#trackSwitcherTabsRow::-webkit-scrollbar {
+    display: none;
+}
+
+.profile-tab {
+    flex-shrink: 0;
+    border: 0;
+    background: none;
+    padding: 14px 4px 12px;
+    white-space: nowrap;
+    color: #718096;
+    font-size: 13px;
+    font-weight: 700;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.profile-tab.active, .profile-tab:hover {
+    color: #1F274B;
+    border-color: #57BA9E;
+}
+
+/* KPI Stats Section */
+.kpi-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.kpi-stat-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.06);
+}
+
+.kpi-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #edf6f2;
+    color: #2D396E;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+.kpi-stat-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* Schedule List Card */
+.schedule-item {
+    border-right: 3px solid #57BA9E;
+    padding: 0 14px;
+    margin-bottom: 16px;
+    transition: all 0.2s ease;
+}
+
+.schedule-item:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: #236E58;
+    background: #e8f8f4;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+/* Achievement Item */
+.achievement-item {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.achievement-medal {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #b68d49;
+    background: #fff6e5;
+    flex-shrink: 0;
+}
+
+/* Weekly Goal / Subscription Card */
+.goal-card {
+    background: linear-gradient(135deg, #f5fbf7 0%, #edf6f2 100%);
+    border: 1px solid #c9ebd8;
+}
+
+@media(max-width: 900px) {
+    .kpi-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .profile-cover {
+        height: 95px;
+        padding: 16px;
+    }
+    .profile-cover-text {
+        font-size: 11px;
+    }
+    .profile-body {
+        padding: 0 18px 18px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .profile-avatar {
+        width: 76px;
+        height: 76px;
+        font-size: 22px;
+        margin-top: -38px;
+    }
+    .profile-tabs {
+        padding: 0 16px;
+        gap: 18px;
+    }
+}
+
+@media(max-width: 640px) {
+    .profile-cover {
+        height: 78px;
+        padding: 10px 14px;
+        border-radius: 18px 18px 0 0;
+    }
+    .profile-cover-text {
+        font-size: 10.5px;
+        opacity: 0.92;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .profile-body {
+        padding: 0 12px 14px;
+        gap: 10px;
+    }
+    .profile-avatar {
+        width: 68px;
+        height: 68px;
+        font-size: 19px;
+        margin-top: -34px;
+        border-width: 3px;
+    }
+    .profile-tabs {
+        padding: 0 14px;
+        gap: 16px;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x;
+        overscroll-behavior-x: contain;
+    }
+    .profile-tab {
+        flex-shrink: 0;
+        padding: 12px 4px 10px;
+        font-size: 12.5px;
+    }
+    .kpi-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .kpi-stat-card {
+        padding: 12px;
+        border-radius: 14px;
+        gap: 10px;
+    }
+    .kpi-stat-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+    .kpi-stat-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+    .schedule-item {
+        padding: 0 10px;
+        margin-bottom: 12px;
+    }
+    .goal-card {
+        padding: 14px;
+    }
+    .safe-bottom {
+        padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+/* ========================================================
+   RESPONSIVE VIDEO PLAYER & FULLSCREEN LANDSCAPE SUPPORT
+   ======================================================== */
+
+.video-modal-overlay {
+    transition: all 0.2s ease-in-out;
+}
+
+.video-player-box {
+    position: relative;
+    width: 100%;
+    background-color: #000;
+}
+
+/* Mobile Landscape: Edge-to-edge cinema mode */
+@media (max-width: 950px) and (orientation: landscape), (max-height: 520px) and (orientation: landscape) {
+    .video-modal-overlay {
+        padding: 0 !important;
+    }
+    .video-modal-container {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+    }
+    .video-player-box {
+        flex: 1 1 auto !important;
+        height: calc(100vh - 46px) !important;
+        max-height: calc(100vh - 46px) !important;
+        aspect-ratio: auto !important;
+    }
+    .video-bottom-bar {
+        display: none !important;
+    }
+    .video-top-bar {
+        padding: 6px 12px !important;
+    }
+}
+
+/* Force CSS Landscape Rotation (When phone is held vertically) */
+.video-rotate-landscape {
+    padding: 0 !important;
+    background: #000 !important;
+    overflow: hidden !important;
+}
+
+@media (orientation: portrait) {
+    .video-rotate-landscape .video-modal-container {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vh !important;
+        height: 100vw !important;
+        max-width: none !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        transform: translate(100vw, 0) rotate(90deg) !important;
+        transform-origin: 0 0 !important;
+        z-index: 999999 !important;
+    }
+    .video-rotate-landscape .video-player-box {
+        aspect-ratio: auto !important;
+        flex: 1 1 auto !important;
+        height: calc(100vw - 46px) !important;
+        max-height: calc(100vw - 46px) !important;
+    }
+    .video-rotate-landscape .video-bottom-bar {
+        display: none !important;
+    }
+    .video-rotate-landscape .video-top-bar {
+        padding: 6px 12px !important;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════════ */
+/* Quizzes Modal - Pinned Sticky Footer and Smooth Questions Scroll  */
+/* ══════════════════════════════════════════════════════════════════ */
+#quizzesModal .quiz-modal-card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 92vh !important;
+    max-height: 94vh !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+#quizzesModal #quizActiveView {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+#quizzesModal #quizActiveView.hidden {
+    display: none !important;
+}
+
+#quizzesModal #quizSelectionView {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+#quizzesModal #quizSelectionView.hidden {
+    display: none !important;
+}
+
+#quizzesModal #quizResultView {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+#quizzesModal #quizResultView.hidden {
+    display: none !important;
+}
+
+#quizzesModal #quizQuestionsContainer {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 1.25rem !important;
+}
+
+#quizzesModal .quiz-sticky-footer {
+    flex-shrink: 0 !important;
+    background: #ffffff !important;
+    border-top: 2px solid #e2e8f0 !important;
+    padding: 0.65rem 0.25rem !important;
+    z-index: 50 !important;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08) !important;
+    position: relative !important;
+}
+
+@media (max-width: 768px) {
+    #quizzesModal.modal-overlay > div,
+    #quizzesModal .quiz-modal-card {
+        height: 94vh !important;
+        max-height: 94vh !important;
+        padding-top: 0.75rem !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px)) !important;
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    #quizzesModal .quiz-sticky-footer {
+        padding-top: 0.5rem !important;
+        padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    #quizzesModal #btnSubmitQuiz {
+        min-height: 48px !important;
+        font-size: 13px !important;
+    }
+}
+

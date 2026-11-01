@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>أكاديمية منير — بوابة الطالب وولي الأمر</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap">
+    <link rel="stylesheet" href="css/custom.css?v=20261028_v1">
+    <link rel="stylesheet" href="css/mounir_theme.css?v=20261028_v1">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      body {
+        background: #f1f5f9;
+        font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      /* Safe area support for iOS and Android navigation bars */
+      .safe-bottom {
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      }
+      .mn-nav {
+        padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+      }
+      /* Ensure touch targets are at least 48px */
+      .cursor-interaction {
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* Accordion smooth transition */
+      .mn-details {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease-out, opacity 0.25s ease-in-out;
+        opacity: 0;
+      }
+      .mn-details.open {
+        max-height: 1000px;
+        opacity: 1;
+      }
+      /* Mobile modal styling */
+      .modal-overlay {
+        transition: opacity 0.2s ease;
+      }
+    </style>
+</head>
+<body class="antialiased text-[#142d4e] selection:bg-emerald-100 selection:text-emerald-900">
+
+    <div class="hidden bg-gradient-to-r from-indigo-950 via-[#1F274B] to-slate-900 text-white border-b-2 border-indigo-500/60 py-1.5 sm:py-2 px-3 sm:px-4 shadow-md sticky top-[49px] sm:top-[57px] z-30" id="adminStudentSupervisorBar">
+<div class="max-w-6xl mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 sm:gap-3 text-xs">
+<!-- Row 1: Status Badge & Quick Navigation Controls -->
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-1.5">
+<span class="bg-indigo-600 text-white font-black px-2 py-0.5 rounded-lg flex items-center gap-1 text-[11px] shadow-xs">
+<span>إشراف الإدارة</span>
+</span>
+<span class="text-slate-300 font-bold hidden md:inline text-[11px]">تبديل الطالب:</span>
+</div>
+<div class="flex items-center gap-1.5 flex-wrap">
+<button class="bg-indigo-900/90 hover:bg-indigo-800 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg transition border border-indigo-500/40 flex items-center gap-1 cursor-pointer" onclick="openStudentSearchModal()" title="بحث سريع بين كل الطلاب" type="button">
+<span>بحث</span>
+</button>
+<a class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-[11px] font-bold px-2.5 py-1 rounded-lg transition border border-slate-700 flex items-center gap-1" href="admin.html">
+<span>الإدارة</span>
+</a>
+<a class="bg-emerald-800/90 hover:bg-emerald-700 text-emerald-100 hover:text-white text-[11px] font-bold px-2.5 py-1 rounded-lg transition border border-emerald-600/50 flex items-center gap-1" href="teacher.html" target="_blank">
+<span>المعلمين</span>
+</a>
+</div>
+</div>
+<!-- Row 2: Full-Width Student Switcher Dropdown on Mobile -->
+<div class="w-full sm:w-auto flex-1 sm:max-w-xs">
+<select class="w-full bg-slate-900 border border-indigo-400/50 text-white rounded-xl px-2.5 py-1.5 text-[11px] sm:text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer truncate" id="adminStudentQuickSelect" onchange="switchAdminStudentView(this.value)">
+<option value="">جاري تحميل قائمة الطلاب...</option>
+</select>
+</div>
+</div>
+</div>
+
+    <div class="mn-phone" id="mounirStudentApp">
+        <!-- TOP APP HEADER -->
+        <header class="mn-header">
+            <button type="button" class="mn-brand cursor-interaction" data-go="live" title="الرئيسية — حصتي المباشرة" aria-label="أكاديمية منير — حصتي المباشرة">
+                <img src="images/monir_logo_trans.png" alt="أكاديمية منير" class="mn-academy-logo" onerror="this.src='images/favicon.png'; this.style.width='36px';">
+            </button>
+
+            <div class="flex items-center gap-1.5">
+                <span class="inline-flex items-center px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    بوابة الطالب
+                </span>
+            </div>
+
+            <div class="mn-header-actions">
+                <button type="button" class="mn-icon-button cursor-interaction relative" data-go="notifications" title="الإشعارات" aria-label="الإشعارات">
+                    <i data-lucide="bell" class="w-5 h-5 text-slate-600"></i>
+                    <span id="notifBadge" class="hidden absolute top-2 right-2 w-2 h-2 rounded-full bg-red-600 ring-2 ring-white"></span>
+                </button>
+                <button type="button" class="mn-avatar cursor-interaction" data-go="profile" title="حساب الطالب والمساعدة" aria-label="حساب الطالب">
+                    <span id="topUserInitials">ع</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN SCROLLABLE APP PANELS -->
+        <main class="mn-main">
+
+            <!-- 1. PANEL: LIVE (حصتي المباشرة) -->
+            <section data-panel="live">
+                <div class="mn-intro">
+                    <p>السلام عليكم، أهلاً بك</p>
+                    <h1>خطوة جديدة مع <span id="topStudentNameGreet" class="studentNameSpan">عمر</span> <span>✦</span></h1>
+                </div>
+
+                <!-- LIVE SESSION HERO CARD -->
+                <section class="mn-session">
+                    <div class="mn-session-top">
+                        <span class="mn-status" id="liveSessionStatus">
+                            <span id="liveStatusDot"></span>القاعة الذكية
+                        </span>
+                        <i data-lucide="video" class="w-5 h-5 text-emerald-700"></i>
+                    </div>
+
+                    <h2 id="liveCourseTitle">تلاوة وحفظ القرآن الكريم</h2>
+                    <p class="mn-teacher" id="liveTeacherName">مع المعلم المعتمد</p>
+
+                    <div class="mn-time">
+                        <i data-lucide="clock-3" class="w-4 h-4 text-emerald-700"></i>
+                        <span id="liveScheduleTime">اليوم · بتوقيت القاهرة</span>
+                    </div>
+
+                    <button type="button" class="mn-primary cursor-interaction shadow-lg hover:shadow-xl active:scale-[0.98] transition-transform" id="mn-join">
+                        <i data-lucide="video" class="w-5 h-5"></i>
+                        دخول القاعة الذكية
+                    </button>
+
+                    <!-- Hidden element to maintain backwards-compatibility with bottomNavMeetBtn -->
+                    <button id="bottomNavMeetBtn" class="hidden" type="button">
+                        <span id="bottomNavMeetIcon"></span>
+                        <span id="bottomNavMeetLabel"></span>
+                    </button>
+                </section>
+
+                <!-- STUDENT SUMMARY & HIFZ PLAN CARD -->
+                <section class="mn-summary">
+                    <h2>رحلة <span class="studentNameSpan">عمر</span></h2>
+                    <dl class="mn-stats">
+                        <div>
+                            <dt>الرصيد المتبقي</dt>
+                            <dd><span id="statRemainingCredits">--</span> <span>حصص</span></dd>
+                        </div>
+                        <div>
+                            <dt>الحصص التي حضرها</dt>
+                            <dd><span id="presentCount">--</span> <span>حصة</span></dd>
+                            <span id="absentCount" class="hidden">0</span>
+                        </div>
+                    </dl>
+
+                    <div class="mn-progress-label">
+                        <span>خطة الحفظ والمتابعة</span>
+                        <strong id="quranPlanUpdatedBadge" class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-xs">معتمدة</strong>
+                    </div>
+                    <p class="mn-caption">حفظ جديد · ماضي قريب · ماضي بعيد</p>
+
+                    <button type="button" class="mn-disclosure cursor-interaction" id="mn-details-toggle" aria-controls="mn-details" aria-expanded="false">
+                        <span>تفاصيل المتابعة والتسميع</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                    </button>
+
+                    <div class="mn-details" id="mn-details" inert>
+                        <div class="pt-2 space-y-2 border-t border-slate-100 text-sm">
+                            <p><strong>الحفظ الجديد:</strong> <span id="planHifzDisplay">جارٍ التحميل...</span></p>
+                            <p><strong>الماضي القريب:</strong> <span id="planMadiQareebDisplay">جارٍ التحميل...</span></p>
+                            <p><strong>الماضي البعيد:</strong> <span id="planMadiBaeedDisplay">جارٍ التحميل...</span></p>
+                            <p><strong>ملاحظة المعلم:</strong> <span id="planNotesDisplay">لا توجد ملاحظات جديدة</span></p>
+                            
+                            <div class="pt-2">
+                                <button type="button" class="mn-list-button cursor-interaction w-full" data-go="records">
+                                    <span>سجل الحفظ والحضور الأسبوعي</span>
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- QUICK SHORTCUTS -->
+                <div class="grid grid-cols-2 gap-2.5 mt-3">
+                    <button type="button" class="mn-secondary cursor-interaction text-xs font-bold" data-go="ledger">
+                        <i data-lucide="receipt-text" class="w-4 h-4 ml-1.5 text-slate-500"></i>
+                        كشف الحساب
+                    </button>
+                    <button type="button" class="mn-secondary cursor-interaction text-xs font-bold" data-go="support">
+                        <i data-lucide="help-circle" class="w-4 h-4 ml-1.5 text-slate-500"></i>
+                        المساعدة والدعم
+                    </button>
+                </div>
+            </section>
+
+            <!-- 2. PANEL: SCHEDULE (جدول المواعيد) -->
+            <section data-panel="schedule" hidden>
+                <div class="mn-intro">
+                    <p>نتعلّم بخطوات منتظمة</p>
+                    <h1>جدول مواعيد <span class="studentNameSpan">عمر</span></h1>
+                </div>
+
+                <div class="mn-local-nav">
+                    <button type="button" class="mn-secondary cursor-interaction mn-active" data-go="schedule" aria-current="page">المواعيد</button>
+                    <button type="button" class="mn-secondary cursor-interaction" data-go="library">المحتوى المسجل</button>
+                </div>
+
+                <!-- NEXT SESSION HIGHLIGHT -->
+                <section class="mn-summary">
+                    <h2>الحصة القادمة</h2>
+                    <div class="mn-row">
+                        <span class="mn-date">مجدولة</span>
+                        <div>
+                            <strong id="schedCourseTitle">تلاوة وحفظ القرآن</strong>
+                            <p id="schedCourseTime">حسب جدول مجموعتك</p>
+                            <small class="text-slate-500" id="schedTeacherName">بتوقيت القاهرة</small>
+                        </div>
+                    </div>
+                    <button type="button" class="mn-primary cursor-interaction" data-go="live">عرض الحصة المباشرة</button>
+                </section>
+
+                <!-- UPCOMING SCHEDULE LIST (Populated by renderUpcomingScheduleList) -->
+                <section class="mn-summary">
+                    <h2>المواعيد القادمة</h2>
+                    <div id="upcomingScheduleList" class="space-y-2 mt-2">
+                        <div class="text-center py-4 text-xs text-slate-400">جارٍ جلب المواعيد...</div>
+                    </div>
+                </section>
+
+                <!-- TRACKS -->
+                <section class="mn-summary">
+                    <h2>المسارات المسجلة</h2>
+                    <div id="enrolledCoursesTabs" class="space-y-2">
+                        <button type="button" class="mn-list-button cursor-interaction" data-go="course">
+                            <span>القرآن الكريم والحفظ</span>
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <button type="button" class="mn-list-button cursor-interaction" data-go="library">
+                            <span>محاضرات العلوم الشرعية (مسجلة)</span>
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <span id="enrolledCoursesCount" class="hidden">1</span>
+                </section>
+            </section>
+
+            <!-- 3. PANEL: TESTS (الاختبارات) -->
+            <section data-panel="tests" hidden>
+                <div class="mn-intro">
+                    <p>نطمئن على الفهم، خطوة بخطوة</p>
+                    <h1>اختبارات <span class="studentNameSpan">عمر</span></h1>
+                </div>
+                <p class="mn-caption">الاختبارات الشهرية المعتمدة للعلوم الشرعية والقرآن الكريم</p>
+
+                <!-- QUIZ 1001: TAFSIR -->
+                <section class="mn-summary">
+                    <div class="flex items-center justify-between">
+                        <span class="mn-status" id="quizStatus_1001">متاح للاختبار</span>
+                        <span class="text-xs text-slate-500 font-bold">الشهر الأول</span>
+                    </div>
+                    <h2 class="mt-1">التفسير والتدبر</h2>
+                    <p class="mn-teacher">٢٠ سؤالاً · ٤٠ درجة</p>
+                    <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
+                        <span class="text-xs text-slate-600 font-semibold" id="quizScoreText_1001">الدرجة: قيد الانتظار</span>
+                        <button type="button" class="mn-secondary cursor-interaction text-xs px-3 py-1.5 font-bold" onclick="openQuizById(1001)">
+                            بدء / مراجعة الاختبار
+                        </button>
+                    </div>
+                </section>
+
+                <!-- QUIZ 1002: HADITH -->
+                <section class="mn-summary">
+                    <div class="flex items-center justify-between">
+                        <span class="mn-status" id="quizStatus_1002">متاح للاختبار</span>
+                        <span class="text-xs text-slate-500 font-bold">الشهر الأول</span>
+                    </div>
+                    <h2 class="mt-1">الحديث الشريف والسنة</h2>
+                    <p class="mn-teacher">٢٠ سؤالاً · ٤٠ درجة</p>
+                    <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
+                        <span class="text-xs text-slate-600 font-semibold" id="quizScoreText_1002">الدرجة: قيد الانتظار</span>
+                        <button type="button" class="mn-secondary cursor-interaction text-xs px-3 py-1.5 font-bold" onclick="openQuizById(1002)">
+                            بدء / مراجعة الاختبار
+                        </button>
+                    </div>
+                </section>
+
+                <!-- QUIZ 1003: TAJWEED -->
+                <section class="mn-summary">
+                    <div class="flex items-center justify-between">
+                        <span class="mn-status" id="quizStatus_1003">متاح للاختبار</span>
+                        <span class="text-xs text-slate-500 font-bold">الشهر الأول</span>
+                    </div>
+                    <h2 class="mt-1">أحكام التجويد ومخارج الحروف</h2>
+                    <p class="mn-teacher">٢٠ سؤالاً · ٤٠ درجة</p>
+                    <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
+                        <span class="text-xs text-slate-600 font-semibold" id="quizScoreText_1003">الدرجة: قيد الانتظار</span>
+                        <button type="button" class="mn-secondary cursor-interaction text-xs px-3 py-1.5 font-bold" onclick="openQuizById(1003)">
+                            بدء / مراجعة الاختبار
+                        </button>
+                    </div>
+                </section>
+
+                <button type="button" class="mn-list-button cursor-interaction mt-3" data-go="certificates">
+                    <span class="font-bold">سجل الدرجات والشهادات</span>
+                    <i data-lucide="award" class="w-5 h-5 text-amber-600"></i>
+                </button>
+            </section>
+
+            <!-- 4. PANEL: BILLING (الشحن والتجديد) -->
+            <section data-panel="billing" hidden>
+                <div class="mn-intro">
+                    <p>رحلة تعلّم مستمرة ومباركة</p>
+                    <h1>الشحن والتجديد</h1>
+                </div>
+
+                <section class="mn-summary">
+                    <p class="mn-teacher">رصيد مسار تلاوة وحفظ القرآن</p>
+                    <p class="mn-balance"><span id="billingRemainingCredits">--</span> <span>حصص متبقية</span></p>
+                    <p class="mn-teacher" id="billingNoticeText">يمكنك تجديد رصيدك بسهولة لضمان استمرارية الحلقات دون انقطاع.</p>
+
+                    <div class="space-y-2 mt-4">
+                        <button type="button" class="mn-primary cursor-interaction w-full" data-go="packages">
+                            اختيار باقة التجديد
+                        </button>
+                        <button type="button" class="mn-list-button cursor-interaction w-full" data-go="ledger">
+                            <span>كشف الحساب والعمليات السابقة</span>
+                            <i data-lucide="receipt-text" class="w-5 h-5 text-slate-500"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <p class="mn-caption">يُضاف الرصيد فور اعتماد التحويل أو إتمام الدفع الإلكتروني المباشر.</p>
+            </section>
+
+            <!-- 5. PANEL: RECORDS (سجل الحفظ والحضور) -->
+            <section data-panel="records" hidden>
+                <div class="mn-intro">
+                    <p>متابعة مسار القرآن</p>
+                    <h1>سجل الحفظ والحضور</h1>
+                </div>
+
+                <section class="mn-summary">
+                    <h2>الحصص السابقة</h2>
+                    <div id="studentAttendanceRecordsList" class="space-y-3 mt-3">
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                            <span class="mn-status text-emerald-700 bg-emerald-50">حضور مؤكد</span>
+                            <p class="font-bold text-sm text-[#142d4e] mt-1">تسميع الحفظ ومراجعة التلاوة</p>
+                            <p class="text-xs text-slate-500">تم تسجيل الحضور وتحديث الخطة من قبل المعلم.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <button type="button" class="mn-secondary cursor-interaction w-full" data-go="live">العودة إلى حصتي</button>
+            </section>
+
+            <!-- 6. PANEL: CERTIFICATES (الدرجات والشهادات) -->
+            <section data-panel="certificates" hidden>
+                <div class="mn-intro">
+                    <p>إنجازات <span class="studentNameSpan">عمر</span></p>
+                    <h1>الدرجات والشهادات</h1>
+                </div>
+
+                <section class="mn-summary">
+                    <h2>سجل نتائج الاختبارات</h2>
+                    <div class="space-y-2 mt-2" id="certScoresList">
+                        <div class="mn-row">
+                            <strong>التفسير والتدبر</strong>
+                            <span id="certScore_1001">-- / ٤٠</span>
+                        </div>
+                        <div class="mn-row">
+                            <strong>الحديث الشريف</strong>
+                            <span id="certScore_1002">-- / ٤٠</span>
+                        </div>
+                        <div class="mn-row">
+                            <strong>أحكام التجويد</strong>
+                            <span id="certScore_1003">-- / ٤٠</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mn-summary">
+                    <h2>شهادة الإنجاز</h2>
+                    <p class="mn-teacher" id="certStatusNotice">تصدر الشهادة بعد إتمام متطلبات الشهر الأول بنجاح.</p>
+                    <button type="button" class="mn-list-button cursor-interaction mt-2" onclick="openGradebookModal()">
+                        <span>عرض كشف الدرجات التفصيلي</span>
+                        <i data-lucide="award" class="w-4 h-4 text-emerald-700"></i>
+                    </button>
+                </section>
+
+                <button type="button" class="mn-secondary cursor-interaction w-full" data-go="tests">العودة للاختبارات</button>
+            </section>
+
+            <!-- 7. PANEL: LIBRARY (المحتوى المسجل) -->
+            <section data-panel="library" hidden>
+                <div class="mn-intro">
+                    <p>تعلّم في الوقت المناسب لك</p>
+                    <h1>المحتوى المسجل</h1>
+                </div>
+
+                <div class="mn-local-nav">
+                    <button type="button" class="mn-secondary cursor-interaction" data-go="schedule">المواعيد</button>
+                    <button type="button" class="mn-secondary cursor-interaction mn-active" data-go="library" aria-current="page">المحتوى المسجل</button>
+                </div>
+
+                <section class="mn-summary">
+                    <button type="button" class="mn-list-button cursor-interaction" data-go="media" data-content="التفسير والتدبر">
+                        <span>
+                            <strong>التفسير والتدبر</strong>
+                            <small>مرئي ملخص الشهر الأول</small>
+                        </span>
+                        <i data-lucide="circle-play" class="w-5 h-5 text-emerald-700"></i>
+                    </button>
+                    <button type="button" class="mn-list-button cursor-interaction" data-go="media" data-content="الحديث الشريف">
+                        <span>
+                            <strong>الحديث الشريف</strong>
+                            <small>مرئي ملخص الشهر الأول</small>
+                        </span>
+                        <i data-lucide="circle-play" class="w-5 h-5 text-emerald-700"></i>
+                    </button>
+                    <button type="button" class="mn-list-button cursor-interaction" data-go="media" data-content="أحكام التجويد">
+                        <span>
+                            <strong>أحكام التجويد</strong>
+                            <small>مخارج الحروف والتطبيق العملي</small>
+                        </span>
+                        <i data-lucide="circle-play" class="w-5 h-5 text-emerald-700"></i>
+                    </button>
+                    <button type="button" class="mn-list-button cursor-interaction" data-go="podcast">
+                        <span>
+                            <strong>بودكاست «من يدلني؟»</strong>
+                            <small>٤ حلقات صوتية تربوية</small>
+                        </span>
+                        <i data-lucide="headphones" class="w-5 h-5 text-emerald-700"></i>
+                    </button>
+                </section>
+            </section>
+
+            <!-- 8. PANEL: MEDIA (مشغل الفيديو) -->
+            <section data-panel="media" hidden>
+                <div class="mn-intro">
+                    <p>مكتبة المسارات</p>
+                    <h1 id="mn-media-title">التفسير والتدبر</h1>
+                </div>
+
+                <section class="mn-summary text-center">
+                    <div id="mediaVideoPlayerContainer" class="aspect-video w-full rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center">
+                        <iframe id="mediaMainIframe" class="w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="فيديو المحاضرة" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <h2 class="mt-3" id="mediaVideoTitle">ملخص الشهر الأول</h2>
+                    <p class="text-xs text-slate-500 mt-1">مشاهدة مباركة ونافعة بإذن الله</p>
+                    <button type="button" class="mn-secondary cursor-interaction w-full mt-4" data-go="library">العودة إلى المكتبة</button>
+                </section>
+            </section>
+
+            <!-- 9. PANEL: PODCAST (بودكاست الأكاديمية) -->
+            <section data-panel="podcast" hidden>
+                <div class="mn-intro">
+                    <p>بودكاست الأكاديمية التربوي</p>
+                    <h1>مَن يدلّني؟</h1>
+                </div>
+
+                <section class="mn-summary space-y-3">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <strong class="text-sm block text-[#142d4e]">١ · كتاب حكيم… يغيّر اختياراتي</strong>
+                        <audio controls class="w-full mt-2 h-9">
+                            <source src="audio/podcast_ep1.mp3" type="audio/mpeg">
+                            متصفحك لا يدعم مشغل الصوتيات.
+                        </audio>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <strong class="text-sm block text-[#142d4e]">٢ · أذنك… وقلبك… وطريقك</strong>
+                        <audio controls class="w-full mt-2 h-9">
+                            <source src="audio/podcast_ep2.mp3" type="audio/mpeg">
+                            متصفحك لا يدعم مشغل الصوتيات.
+                        </audio>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <strong class="text-sm block text-[#142d4e]">٣ · مين قالك؟</strong>
+                        <audio controls class="w-full mt-2 h-9">
+                            <source src="audio/podcast_ep3.mp3" type="audio/mpeg">
+                            متصفحك لا يدعم مشغل الصوتيات.
+                        </audio>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <strong class="text-sm block text-[#142d4e]">٤ · إيه اللي يخليك حكيم؟</strong>
+                        <audio controls class="w-full mt-2 h-9">
+                            <source src="audio/podcast_ep4.mp3" type="audio/mpeg">
+                            متصفحك لا يدعم مشغل الصوتيات.
+                        </audio>
+                    </div>
+
+                    <button type="button" class="mn-list-button cursor-interaction w-full" data-go="library">
+                        <span>العودة إلى المكتبة</span>
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                </section>
+            </section>
+
+            <!-- 10. PANEL: COURSE (تفاصيل المسار) -->
+            <section data-panel="course" hidden>
+                <div class="mn-intro">
+                    <p>مسار الطالب</p>
+                    <h1>القرآن الكريم والحفظ</h1>
+                </div>
+
+                <section class="mn-summary">
+                    <h2>المعلم والمواعيد</h2>
+                    <div class="mn-row">
+                        <span>المعلم المشرف</span>
+                        <strong id="courseTeacherName">الشيخ المعتمد</strong>
+                    </div>
+                    <div class="mn-row">
+                        <span>نوع الحلقة</span>
+                        <span id="courseGroupType">حلقة جماعية منتظمة</span>
+                    </div>
+                    <div class="mn-row">
+                        <span>المواعيد الأسبوعية</span>
+                        <span id="courseScheduleDays">حسب جدول مجموعتك</span>
+                    </div>
+                </section>
+
+                <div class="space-y-2 mt-3">
+                    <button type="button" class="mn-primary cursor-interaction w-full" data-go="live">الحصة وخطة الحفظ</button>
+                    <button type="button" class="mn-secondary cursor-interaction w-full" data-go="records">سجل الحصص والمتابعة</button>
+                    <button type="button" class="mn-disclosure cursor-interaction w-full" data-go="billing">رصيد هذا المسار وتجديده</button>
+                </div>
+            </section>
+
+            <!-- 11. PANEL: PACKAGES (اختيار الباقة) -->
+            <section data-panel="packages" hidden>
+                <div class="mn-intro">
+                    <p>تجديد مسار القرآن · ١ من ٣</p>
+                    <h1>اختيار الباقة</h1>
+                </div>
+
+                <fieldset class="mn-summary">
+                    <legend>باقات التجديد المتاحة</legend>
+                    <label class="mn-package cursor-interaction">
+                        <input type="radio" name="mn-package" value="group" checked>
+                        <span>
+                            <strong>باقة مجموعة · ٤ حصص</strong>
+                            <small>٤٥–٦٠ دقيقة · ٤٠٠ ج.م</small>
+                        </span>
+                    </label>
+                    <label class="mn-package cursor-interaction">
+                        <input type="radio" name="mn-package" value="group_8">
+                        <span>
+                            <strong>باقة مجموعة · ٨ حصص</strong>
+                            <small>٤٥–٦٠ دقيقة · ٨٠٠ ج.م</small>
+                        </span>
+                    </label>
+                    <label class="mn-package cursor-interaction">
+                        <input type="radio" name="mn-package" value="private">
+                        <span>
+                            <strong>باقة خاصة فردية · ٤ حصص</strong>
+                            <small>٦٠ دقيقة مع المعلم مباشرة · ١٠٠٠ ج.م</small>
+                        </span>
+                    </label>
+                    <p class="mn-caption">الأسعار معتمدة وفق لائحة الأكاديمية الرسمية.</p>
+                </fieldset>
+
+                <button type="button" class="mn-primary cursor-interaction w-full" data-go="payment">متابعة لطريقة التحويل</button>
+            </section>
+
+            <!-- 12. PANEL: PAYMENT (طريقة التحويل) -->
+            <section data-panel="payment" hidden>
+                <div class="mn-intro">
+                    <p>تجديد مسار القرآن · ٢ من ٣</p>
+                    <h1>طريقة التحويل</h1>
+                </div>
+
+                <fieldset class="mn-summary">
+                    <legend id="mn-payment-summary">باقة مجموعة · ٤ حصص · ٤٠٠ ج.م</legend>
+
+                    <label class="mn-package cursor-interaction">
+                        <input type="radio" name="mn-method" value="instapay" checked>
+                        <span>
+                            <strong>إنستاباي (InstaPay)</strong>
+                            <small class="text-emerald-700">moniracademy@instapay</small>
+                        </span>
+                    </label>
+
+                    <label class="mn-package cursor-interaction">
+                        <input type="radio" name="mn-method" value="vodafone">
+                        <span>
+                            <strong>فودافون كاش</strong>
+                            <small class="text-emerald-700"></small>
+                        </span>
+                    </label>
+
+                    <label class="mn-package cursor-interaction">
+                        <input type="radio" name="mn-method" value="paymob">
+                        <span>
+                            <strong>دفع إلكتروني فوري (Paymob)</strong>
+                            <small>بطاقة بنكية أو ميزة</small>
+                        </span>
+                    </label>
+
+                    <div class="pt-3 border-t border-slate-100">
+                        <button type="button" class="mn-secondary cursor-interaction w-full text-xs font-bold" onclick="sendWhatsAppRenewalNotice()">
+                            <i data-lucide="message-circle" class="w-4 h-4 ml-1.5 text-emerald-600"></i>
+                            إرسال إيصال التحويل عبر واتساب
+                        </button>
+                    </div>
+                </fieldset>
+
+                <div class="space-y-2 mt-3">
+                    <button type="button" class="mn-primary cursor-interaction w-full" data-go="pending">تأكيد إرسال الطلب</button>
+                    <button type="button" class="mn-disclosure cursor-interaction w-full" data-go="packages">تغيير الباقة</button>
+                </div>
+            </section>
+
+            <!-- 13. PANEL: PENDING (الطلب قيد المراجعة) -->
+            <section data-panel="pending" hidden>
+                <div class="mn-intro">
+                    <p>تجديد مسار القرآن · ٣ من ٣</p>
+                    <h1>الطلب قيد المراجعة</h1>
+                </div>
+
+                <section class="mn-summary mn-empty text-center">
+                    <span class="mn-empty-icon inline-grid place-items-center w-12 h-12 rounded-full bg-emerald-50 text-emerald-700 mx-auto">
+                        <i data-lucide="clock-3" class="w-6 h-6"></i>
+                    </span>
+                    <h2 class="mt-2">بانتظار اعتماد الإدارة</h2>
+                    <p class="text-sm text-slate-600 mt-1">بعد مراجعة وتأكيد التحويل من الحسابات، يُضاف رصيد الحصص لحساب الطالب تلقائياً.</p>
+                    <button type="button" class="mn-primary cursor-interaction w-full mt-4" data-go="billing">العودة إلى الرصيد</button>
+                </section>
+            </section>
+
+            <!-- 14. PANEL: LEDGER (كشف الحساب والتجديدات) -->
+            <section data-panel="ledger" hidden>
+                <div class="mn-intro">
+                    <p>مسار القرآن الكريم</p>
+                    <h1>كشف الحساب والتجديدات</h1>
+                </div>
+
+                <section class="mn-summary">
+                    <h2>الرصيد المتاح: <span id="ledgerRemainingCredits">--</span> حصص</h2>
+                    <p class="mn-teacher">الحصص التي حضرها الطالب: <span id="ledgerAttendedCount">--</span> حصة</p>
+                    <button type="button" class="mn-list-button cursor-interaction mt-2" data-go="records">
+                        <span>تفاصيل الحضور والأعذار</span>
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                </section>
+
+                <section class="mn-summary">
+                    <h2>العمليات الأخيرة</h2>
+                    <div id="studentLedgerTransactionsList" class="space-y-2 mt-2 text-xs">
+                        <div class="text-center py-4 text-slate-400">جارٍ جلب سجل العمليات...</div>
+                    </div>
+                </section>
+
+                <button type="button" class="mn-secondary cursor-interaction w-full" data-go="billing">العودة إلى الرصيد</button>
+            </section>
+
+            <!-- 15. PANEL: PROFILE (حساب الطالب والمساعدة) -->
+            <section data-panel="profile" hidden>
+                <div class="mn-intro">
+                    <p>حساب الطالب</p>
+                    <h1>ملفي والمساعدة</h1>
+                </div>
+
+                <section class="mn-summary">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-800 font-extrabold text-lg flex items-center justify-center border border-emerald-200">
+                            <span id="profileUserInitials">ع</span>
+                        </div>
+                        <div>
+                            <h2 id="studentName">عمر أحمد</h2>
+                            <p class="text-xs text-slate-500 font-mono" id="studentCode">ST0423</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 mt-4 pt-3 border-t border-slate-100 text-xs">
+                        <div class="mn-row">
+                            <span>ولي الأمر</span>
+                            <strong id="parentName">--</strong>
+                        </div>
+                        <div class="mn-row">
+                            <span>رقم الهاتف</span>
+                            <strong id="parentPhone" dir="ltr">--</strong>
+                        </div>
+                        <div class="mn-row">
+                            <span>حالة الحساب</span>
+                            <span id="accountStatusBadge" class="text-emerald-700 font-bold">نشط</span>
+                        </div>
+                    </div>
+
+                    <div class="text-center pt-3 mt-3 border-t border-slate-100">
+                        <img id="studentQrImg" src="" alt="كود الطالب QR" class="w-24 h-24 mx-auto rounded-lg border border-slate-200">
+                        <p class="text-[10px] text-slate-400 mt-1">كود الطالب الرقمي المعتمد</p>
+                    </div>
+
+                    <div class="space-y-2 mt-4">
+                        <button type="button" class="mn-list-button cursor-interaction" data-go="notifications">
+                            <span>الإشعارات والتنبيهات</span>
+                            <i data-lucide="bell" class="w-4 h-4 text-slate-500"></i>
+                        </button>
+                        <button type="button" class="mn-list-button cursor-interaction" data-go="support">
+                            <span>المساعدة وتذاكر الدعم</span>
+                            <i data-lucide="life-buoy" class="w-4 h-4 text-emerald-600"></i>
+                        </button>
+                        <button type="button" class="mn-list-button cursor-interaction" data-go="records">
+                            <span>سجل الحفظ والحضور</span>
+                            <i data-lucide="calendar" class="w-4 h-4 text-slate-500"></i>
+                        </button>
+                    </div>
+
+                    <div class="pt-4 mt-2 border-t border-slate-100">
+                        <button type="button" id="studentAuthBtn" class="w-full cursor-interaction py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition">
+                            تسجيل الخروج من الحساب
+                        </button>
+                    </div>
+                </section>
+            </section>
+
+            <!-- 16. PANEL: NOTIFICATIONS (إشعارات الطالب) -->
+            <section data-panel="notifications" hidden>
+                <div class="mn-intro">
+                    <p>آخر المستجدات والتنبيهات</p>
+                    <h1>إشعارات <span class="studentNameSpan">عمر</span></h1>
+                </div>
+
+                <section class="mn-summary space-y-2" id="notificationsPageList">
+                    <div class="p-3 bg-emerald-50/50 border border-emerald-100 rounded-xl">
+                        <h2 class="text-sm font-bold text-emerald-900">مرحباً بك في أكاديمية منير</h2>
+                        <p class="text-xs text-slate-600 mt-1">تم تفعيل حسابك وحجز مقعدك في الحلقة. نسأل الله لك التوفيق والسداد.</p>
+                    </div>
+                </section>
+
+                <button type="button" class="mn-secondary cursor-interaction w-full" data-go="profile">العودة إلى ملفي</button>
+            </section>
+
+            <!-- 17. PANEL: SUPPORT (المساعدة وتذاكر الدعم) -->
+            <section data-panel="support" hidden>
+                <div class="mn-intro">
+                    <p>نحن هنا لخدمتك دائماً</p>
+                    <h1>المساعدة وتذاكر الدعم</h1>
+                </div>
+
+                <section class="mn-summary">
+                    <label class="mn-field">
+                        <span>نوع الطلب أو الاستفسار</span>
+                        <select id="ticketCategory" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-[#142d4e]">
+                            <option value="room">مشكلة في دخول القاعة الذكية</option>
+                            <option value="billing">استفسار عن الشحن والرصيد</option>
+                            <option value="profile">طلب تعديل بيانات الطالب أو ولي الأمر</option>
+                            <option value="schedule">طلب نقل موعد أو تغيير المجموعة</option>
+                            <option value="other">مقترح أو استفسار عام</option>
+                        </select>
+                    </label>
+
+                    <label class="mn-field mt-3">
+                        <span>عنوان الطلب</span>
+                        <input type="text" id="ticketSubject" placeholder="اكتب ملخصاً للمشكلة أو الطلب..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                    </label>
+
+                    <label class="mn-field mt-3">
+                        <span>تفاصيل الطلب</span>
+                        <textarea id="ticketMessage" placeholder="اكتب التفاصيل هنا بوضوح وسيقوم المشرف بالرد عليك فوراً..." rows="3" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm"></textarea>
+                    </label>
+
+                    <button type="button" class="mn-primary cursor-interaction w-full mt-3" id="btnSubmitTicket" onclick="handleMobileTicketSubmit()">
+                        إرسال تذكرة الدعم
+                    </button>
+
+                    <p id="ticketSuccessNotice" class="text-xs font-bold text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 mt-3 hidden text-center">
+                        تم استلام تذكرتك بنجاح! سيتم التواصل معك عبر رقم الواتساب المسجل.
+                    </p>
+
+                    <div class="pt-4 mt-3 border-t border-slate-100">
+                        <button type="button" class="mn-secondary cursor-interaction w-full text-xs font-bold" onclick="openWhatsAppDirectSupport()">
+                            <i data-lucide="message-circle" class="w-4 h-4 ml-1.5 text-emerald-600"></i>
+                            محادثة فورية مع المشرف عبر واتساب
+                        </button>
+                    </div>
+                </section>
+
+                <button type="button" class="mn-secondary cursor-interaction w-full" data-go="profile">العودة إلى ملفي</button>
+            </section>
+
+            <!-- 18. PANEL: ROOM (الانتقال إلى القاعة) -->
+            <section data-panel="room" hidden>
+                <div class="mn-intro">
+                    <p>القاعة الذكية</p>
+                    <h1>أهلاً يا <span class="studentNameSpan">عمر</span></h1>
+                </div>
+
+                <section class="mn-summary mn-empty text-center">
+                    <span class="mn-empty-icon inline-grid place-items-center w-12 h-12 rounded-full bg-emerald-50 text-emerald-700 mx-auto">
+                        <i data-lucide="video" class="w-6 h-6"></i>
+                    </span>
+                    <h2 class="mt-2">الانتقال إلى القاعة الذكية</h2>
+                    <p class="text-sm text-slate-600 mt-1">يتم الآن فتح رابط حلقة القرآن الكريم مباشرة في نافذة جديدة.</p>
+
+                    <div class="space-y-2 mt-4">
+                        <button type="button" class="mn-primary cursor-interaction w-full" onclick="launchLiveRoomDirectly()">
+                            الانتقال للقاعة الآن
+                        </button>
+                        <button type="button" class="mn-secondary cursor-interaction w-full" data-go="live">
+                            العودة إلى حصتي
+                        </button>
+                    </div>
+                </section>
+            </section>
+
+        </main>
+
+        <!-- FIXED BOTTOM NAVIGATION BAR (4 Primary Tabs) -->
+        <nav class="mn-nav" aria-label="التنقل الرئيسي">
+            <button type="button" class="cursor-interaction mn-active" data-go="live" aria-label="حصتي المباشرة" aria-current="page">
+                <i data-lucide="video" class="w-5 h-5"></i>
+                <span>حصتي</span>
+            </button>
+            <button type="button" class="cursor-interaction" data-go="schedule" aria-label="جدول المواعيد">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                <span>الجدول</span>
+            </button>
+            <button type="button" class="cursor-interaction" data-go="tests" aria-label="الاختبارات">
+                <i data-lucide="file-check-2" class="w-5 h-5"></i>
+                <span>الاختبارات</span>
+            </button>
+            <button type="button" class="cursor-interaction" data-go="billing" aria-label="الشحن والتجديد">
+                <i data-lucide="wallet" class="w-5 h-5"></i>
+                <span>الشحن</span>
+            </button>
+        </nav>
+
+        <div class="mn-homebar"></div>
+    </div>
+
+    <!-- PRESERVED MODALS FOR BACKWARDS-COMPATIBILITY -->
+    <div id="preservedModalsContainer">
+        <div class="modal-overlay hidden" id="notificationsModal">
+<div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-200">
+<div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+<h3 class="font-extrabold text-base text-slate-900">
+                    مركز الإشعارات والتنبيهات
+                </h3>
+<button class="text-slate-400 hover:text-slate-600 text-lg font-bold" onclick="toggleNotifications()">×</button>
+</div>
+<div class="space-y-3 max-h-80 overflow-y-auto pr-1" id="notificationsList">
+<!-- Injected via JS -->
+</div>
+</div>
+</div><div class="modal-overlay hidden" id="supportModal">
+<div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+<div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+<div>
+<h3 class="font-extrabold text-base text-slate-900">منظومة الدعم الفني والمقترحات والشكاوى</h3>
+<p class="text-[11px] text-slate-500">فريق الأكاديمية يرد خلال 24 ساعة مباشرة</p>
+</div>
+<button class="text-slate-400 hover:text-slate-600 text-xl font-bold" onclick="closeSupportModal()">×</button>
+</div>
+<div class="flex border-b border-slate-200 mb-4 text-xs font-bold">
+<button class="py-2 px-4 border-b-2 border-blue-900 text-blue-900" id="tabSupportNew" onclick="switchSupportTab('new')">
+                    تقديم تذكرة جديدة
+                </button>
+<button class="py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800" id="tabSupportList" onclick="switchSupportTab('list')">
+                    متابعة التذاكر والردود (<span id="ticketCountBadge">0</span>)
+                </button>
+</div>
+<div class="space-y-3 text-xs" id="supportFormTab">
+<div>
+<label class="block font-bold text-slate-700 mb-1">نوع الاستفسار / الشكوى:</label>
+<select class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 outline-none font-bold" id="ticketCategory">
+<option value="تسجيل ودفع">الدفع ورسوم التجديد (Paymob)</option>
+<option value="مواعيد وغياب">مواعيد المحاضرات والأعذار</option>
+<option value="تقني">مشكلة تقنية في Google Meet أو الروابط</option>
+<option value="اقتراح">اقتراح لتطوير المحتوى</option>
+<option value="عام">استفسار عام</option>
+</select>
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">الموضوع باختصار:</label>
+<input class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 outline-none font-medium" id="ticketSubject" placeholder="مثال: استفسار عن موعد الحصة القادمة" type="text"/>
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">التفاصيل الكاملة:</label>
+<textarea class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 outline-none font-normal" id="ticketMessage" placeholder="اكتب تفاصيل طلبك هنا..." rows="4"></textarea>
+</div>
+<button class="w-full bg-blue-900 hover:bg-blue-800 text-white font-extrabold text-xs py-3 rounded-xl shadow-md transition" id="btnSubmitTicket" onclick="submitSupportTicket()">
+                    إرسال التذكرة الآن
+                </button>
+</div>
+<div class="hidden space-y-3 max-h-80 overflow-y-auto pr-1 text-xs" id="supportListTab">
+<!-- Injected via JS -->
+</div>
+</div>
+</div><div class="modal-overlay hidden p-2 sm:p-4 z-[9999]" id="quizzesModal">
+<div class="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full p-3 sm:p-6 shadow-2xl border border-slate-200 max-h-[94vh] flex flex-col my-auto overflow-hidden quiz-modal-card">
+<div class="flex justify-between items-center mb-2.5 sm:mb-4 pb-2 sm:pb-2.5 border-b border-slate-100 shrink-0">
+<div>
+<h3 class="font-black text-base sm:text-lg text-slate-900" id="quizModalTitle">الامتحانات الشهرية الشاملة</h3>
+<p class="text-[11px] sm:text-xs text-slate-500 font-medium" id="quizModalSubtitle">ملخص الشهر الأول • 20 سؤالاً (40 درجة) • متاح اليوم الجمعة حتى 12:00 منتصف الليل</p>
+</div>
+<button class="text-slate-400 hover:text-slate-600 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-xl hover:bg-slate-100 transition cursor-pointer" onclick="closeQuizzesModal()">×</button>
+</div>
+<!-- Quiz Selection View (Shows Only the 3 Tracks - Zero Weekly Division) -->
+<div class="space-y-3 overflow-y-auto max-h-[78vh] pr-0.5" id="quizSelectionView">
+<div class="space-y-3" id="quizzesListContainer">
+<!-- Injected via JS -->
+</div>
+</div>
+<!-- Quiz Active Questions View -->
+<div class="hidden flex-col flex-1 min-h-0 space-y-2.5 sm:space-y-3 text-xs overflow-hidden" id="quizActiveView">
+<div class="bg-slate-50 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 shrink-0">
+<strong class="text-slate-900 font-black text-xs sm:text-sm" id="activeQuizTitle">امتحان المسار</strong>
+<span class="text-indigo-900 bg-indigo-100 font-black text-[10px] sm:text-[11px] px-2.5 py-1 rounded-lg" id="activeQuizMeta">20 سؤالاً • 40 درجة إجمالية (درجتان لكل سؤال)</span>
+</div>
+<div class="flex-1 min-h-0 space-y-3 overflow-y-auto pr-1 pl-0.5" id="quizQuestionsContainer">
+<!-- Injected questions -->
+</div>
+<div class="quiz-sticky-footer pt-2 sm:pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2 shrink-0 bg-white" id="quizStickyFooter">
+<button class="w-full sm:flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-black py-3 sm:py-3.5 rounded-xl sm:rounded-2xl shadow-md transition text-xs sm:text-sm cursor-pointer" id="btnSubmitQuiz" onclick="submitActiveQuiz()">
+                        إرسال الإجابات واعتماد النتيجة (40 درجة)
+                    </button>
+<button class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3 rounded-xl sm:rounded-2xl transition text-xs sm:text-sm cursor-pointer" onclick="backToQuizList()">
+                        رجوع
+                    </button>
+</div>
+</div>
+<!-- Quiz Result & Detailed Review View -->
+<div class="hidden text-center py-2 sm:py-4 space-y-3 sm:space-y-4 text-xs overflow-y-auto max-h-[80vh] pr-0.5" id="quizResultView">
+<div class="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 text-emerald-800 rounded-full flex items-center justify-center mx-auto text-xl sm:text-2xl font-black shadow-inner" id="quizResultIcon">
+                    100%
+                </div>
+<div>
+<h4 class="text-base sm:text-lg font-black text-slate-900" id="quizResultTitle">أحسنت! تم اجتياز الاختبار بنجاح</h4>
+<p class="text-slate-500 mt-1 text-xs sm:text-sm" id="quizResultScore">حصلت على 40 من 40 درجات (100%)</p>
+</div>
+<!-- Detailed Question-by-Question Review with Answers & Explanations -->
+<div class="hidden text-right space-y-3 mt-3 pt-3 border-t border-slate-200 text-xs" id="quizResultReviewContainer">
+<div class="flex items-center justify-between gap-2 px-1">
+<strong class="text-xs sm:text-sm font-black text-slate-900">مراجعة تفصيلية للإجابات والأخطاء</strong>
+<span class="text-[11px] font-bold text-slate-500" id="quizResultReviewSummary"></span>
+</div>
+<div class="space-y-3 max-h-[48vh] overflow-y-auto pr-1 pl-0.5" id="quizResultReviewList">
+<!-- Injected review cards -->
+</div>
+</div>
+<div class="pt-2 flex justify-center gap-2">
+<button class="w-full sm:w-auto bg-[#1F274B] hover:bg-[#2D396E] text-white font-black px-8 py-3 rounded-xl sm:rounded-2xl transition cursor-pointer text-xs sm:text-sm shadow-md" onclick="backToQuizList()">
+                        العودة لقائمة الامتحانات
+                    </button>
+</div>
+</div>
+</div>
+</div><div class="modal-overlay hidden fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs overflow-y-auto" id="studentLedgerModal">
+<div class="bg-white rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 text-xs my-auto max-h-[94vh] flex flex-col relative" id="studentLedgerModalContent">
+<!-- Dynamic Content Injected via JS -->
+</div>
+</div><div class="modal-overlay hidden" id="gradebookModal">
+<div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
+<div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+<div class="flex items-center gap-2.5">
+<span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center text-xs font-black shrink-0">سجل</span>
+<div>
+<h3 class="font-black text-base text-slate-900">سجل الدرجات التراكمي للطالب</h3>
+<p class="text-[11px] text-slate-500 font-medium">سجل معتمد للمحاضرات العامة والاختبارات الأسبوعية والنهائية</p>
+</div>
+</div>
+<button class="text-slate-400 hover:text-slate-600 text-2xl font-bold" onclick="toggleGradebookModal()">×</button>
+</div>
+<!-- Gradebook Summary KPI Tiles -->
+<div class="grid grid-cols-3 gap-2 text-center text-xs mb-4">
+<div class="bg-slate-50 border border-slate-200 p-2.5 rounded-2xl">
+<span class="text-[10px] text-slate-500 font-bold block mb-0.5">المجموع التراكمي</span>
+<strong class="text-base sm:text-lg font-black text-emerald-600" id="gradebookTotalScore">0 / 100</strong>
+</div>
+<div class="bg-slate-50 border border-slate-200 p-2.5 rounded-2xl">
+<span class="text-[10px] text-slate-500 font-bold block mb-0.5">النسبة المئوية</span>
+<strong class="text-base sm:text-lg font-black text-blue-600" id="gradebookPercentage">0%</strong>
+</div>
+<div class="bg-slate-50 border border-slate-200 p-2.5 rounded-2xl">
+<span class="text-[10px] text-slate-500 font-bold block mb-0.5">التقدير العام</span>
+<strong class="text-xs sm:text-sm font-black text-amber-600 block mt-0.5" id="gradebookRankBadge">جاري التقييم</strong>
+</div>
+</div>
+<!-- Detailed Breakdown by Track -->
+<div class="space-y-3 text-xs" id="gradebookDetailsContainer">
+<!-- Dynamically generated in student.js -->
+</div>
+<div class="mt-5 pt-3 border-t border-slate-100 flex justify-end">
+<button class="bg-[#1F274B] text-white font-bold text-xs px-6 py-2.5 rounded-xl transition cursor-pointer" onclick="toggleGradebookModal()">
+                    إغلاق السجل
+                </button>
+</div>
+</div>
+</div><div class="modal-overlay hidden" id="certificateModal">
+<div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl border border-slate-200 text-center relative max-h-[92vh] overflow-y-auto">
+<button class="absolute top-4 left-4 text-slate-400 hover:text-slate-600 text-2xl font-bold cursor-pointer leading-none" onclick="closeCertificateModal()">×</button>
+<div class="border-4 border-double border-indigo-900/40 p-5 sm:p-7 rounded-2xl bg-gradient-to-b from-amber-50/20 via-white to-indigo-50/20 relative" id="certificatePrintableArea">
+<!-- Academic Seal & Logo -->
+<div class="flex items-center justify-between gap-4 mb-4 border-b pb-3 border-indigo-100">
+<img alt="أكاديمية منير" class="h-9 sm:h-10 w-auto object-contain" src="images/monir_logo_trans.png"/>
+<div class="text-left font-mono text-[10px] text-slate-500">
+<span>CERTIFICATE ID: </span>
+<strong class="text-indigo-950 font-black" id="certModalCode">ST-2026-CERT</strong>
+</div>
+</div>
+<span class="inline-block text-[11px] sm:text-xs font-black tracking-wider text-amber-800 bg-amber-100 border border-amber-300 px-3.5 py-1 rounded-full">
+                    شهادة تقدير وإتمام مرحلة تدريبية
+                </span>
+<h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-3 font-serif">
+                    أكاديمية منير للقرآن الكريم والعلوم الحديثة
+                </h2>
+<p class="text-xs text-slate-500 mt-0.5">تمنح هذه الشهادة المعتمدة تقديراً للاجتهاد والتفوق العلمي والالتزام بالحلقات</p>
+<div class="my-5 py-3 border-y border-dashed border-slate-200">
+<p class="text-xs text-slate-600">يشهد المشرف العام وإدارة الأكاديمية بأن المتدرب/ـة:</p>
+<h3 class="text-xl sm:text-2xl font-black text-indigo-950 mt-1 mb-1.5" id="certModalStudentName">
+                        طالب الأكاديمية
+                    </h3>
+<p class="text-xs text-slate-700 leading-relaxed">
+                        قد اجتاز بنجاح واقتدار متطلبات مرحلة التدريب والتحصيل في:
+                        <br/>
+<strong class="text-xs sm:text-sm font-black text-emerald-800" id="certModalCourseName">مسار تحفيظ القرآن الكريم والتدبر</strong>
+</p>
+</div>
+<div class="grid grid-cols-3 gap-2 sm:gap-3 text-xs mb-5">
+<div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200">
+<span class="text-slate-400 block text-[10px]">نسبة الحضور والالتزام</span>
+<b class="text-emerald-800 font-black text-sm" id="certModalAttendance">100%</b>
+</div>
+<div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200">
+<span class="text-slate-400 block text-[10px]">التقدير التراكمي</span>
+<b class="text-indigo-950 font-black text-xs sm:text-sm" id="certModalGrade">امتياز مع مرتبة الشرف</b>
+</div>
+<div class="bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200">
+<span class="text-slate-400 block text-[10px]">تاريخ الاعتماد</span>
+<b class="text-slate-800 font-bold text-[11px]" id="certModalDate">سبتمبر 2026</b>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs text-slate-600 pt-2 border-t border-slate-100">
+<div class="text-right">
+<span class="block text-[10px] text-slate-400">المعلم المشرف</span>
+<strong class="font-bold text-slate-800 text-[11px]" id="certModalTeacherName">أ. مصطفى عيد</strong>
+</div>
+<div class="text-center">
+<span class="inline-block px-2.5 py-0.5 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-full font-bold text-[10px]">
+                            ختم رسمي معتمد ✓
+                        </span>
+</div>
+<div class="text-left">
+<span class="block text-[10px] text-slate-400">إدارة الأكاديمية</span>
+<strong class="font-bold text-slate-800 text-[11px]">م. أحمد أبو شادي</strong>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-center gap-2.5 mt-5">
+<button class="bg-[#1F274B] hover:bg-[#2D396E] text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow transition cursor-pointer flex items-center gap-1.5" onclick="window.print()" type="button">
+<span>طباعة / حفظ الشهادة PDF</span>
+</button>
+<button class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs px-4 py-2.5 rounded-xl transition cursor-pointer" onclick="closeCertificateModal()" type="button">
+                    إغلاق
+                </button>
+</div>
+</div>
+</div><div class="modal-overlay hidden" id="lockedCertificateModal">
+<div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-200 text-center space-y-4">
+<div class="w-16 h-16 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-inner">
+<svg class="w-8 h-8"><use href="#award"></use></svg>
+</div>
+<div class="space-y-1.5">
+<span class="inline-block bg-amber-50 text-amber-800 text-[10px] font-black px-2.5 py-0.5 rounded-full border border-amber-200">
+                    قيد الإعداد والاعتماد الأكاديمي
+                </span>
+<h3 class="text-base sm:text-lg font-black text-slate-900">الشهادة مقفولة حالياً</h3>
+<p class="text-xs text-slate-500 leading-relaxed">
+                    الشهادة مقفولة وستفتح <b>قريباً</b> فور استكمال متطلبات الدورة واجتياز الاختبار النهائي واعتماد الدرجات من إدارة الأكاديمية.
+                </p>
+</div>
+<div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 text-right space-y-1.5 text-xs">
+<div class="flex justify-between items-center text-[11px]">
+<span class="text-slate-500 font-bold">حالة المرحلة الحالية:</span>
+<span class="text-emerald-700 font-black">جاري التدريب والمتابعة</span>
+</div>
+<div class="flex justify-between items-center text-[11px]">
+<span class="text-slate-500 font-bold">موعد فتح الشهادة:</span>
+<span class="text-amber-800 font-black">ستفتح قريباً بإذن الله</span>
+</div>
+</div>
+<button class="w-full bg-[#1F274B] hover:bg-[#2D396E] text-white font-extrabold text-xs py-3 rounded-xl shadow-md transition cursor-pointer" onclick="closeLockedCertificateModal()" type="button">
+                حسناً، فهمت ذلك
+            </button>
+</div>
+</div><div class="modal-overlay hidden" id="paymobModal">
+<div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
+<div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+<div class="flex items-center gap-2.5">
+<div>
+<h3 class="font-extrabold text-base text-slate-900 leading-tight">شحن وتجديد الاشتراك</h3>
+<p class="text-[11px] text-slate-500 font-medium">التحويل عبر إنستا باي أو فودافون كاش وإرسال الإشعار</p>
+</div>
+</div>
+<button class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 text-xl font-bold flex items-center justify-center transition" onclick="closePaymobModal()">×</button>
+</div>
+<!-- Student & Course Context Bar -->
+<div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 mb-4 flex items-center justify-between text-xs">
+<div class="flex items-center gap-2">
+<span class="text-slate-400 font-medium">المسار:</span>
+<strong class="text-slate-800 font-bold" id="paymobCourseNameBadge">المسار المختار</strong>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-slate-400 font-medium">الطالب:</span>
+<strong class="text-slate-800 font-bold" id="paymobStudentInfo">طالب الأكاديمية</strong>
+</div>
+</div>
+<!-- Packages Selection Header -->
+<div class="mb-3">
+<label class="block font-black text-slate-800 text-xs mb-1">اختر باقة التجديد المطلوبة:</label>
+<p class="text-[11px] text-slate-500">حدد الباقة المناسبة ليتم احتساب المبلغ المطلوب وتجهيز بيانات التحويل</p>
+</div>
+<!-- Packages Selection -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-xs" id="paymobPackageOptions">
+<!-- Group Package Option (400 EGP) -->
+<label class="border-2 border-indigo-600 bg-indigo-50/70 p-3.5 rounded-2xl cursor-pointer flex flex-col justify-between transition shadow-2xs relative" id="pkgCard_group" onclick="selectPaymobPackage('group', 400, 'باقة 4 محاضرات شهرياً (مجموعة)')">
+<input checked="" class="hidden" name="paymobPkg" onchange="selectPaymobPackage('group', 400, 'باقة 4 محاضرات شهرياً (مجموعة)')" type="radio" value="group"/>
+<span class="absolute top-2.5 left-2.5 bg-indigo-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full">الأكثر طلباً</span>
+<div>
+<strong class="block text-slate-900 font-black text-sm">باقة المجموعات</strong>
+<span class="text-slate-500 text-[11px] block mt-0.5">4 محاضرات شهرياً مع المجموعة</span>
+</div>
+<div class="mt-3 pt-2 border-t border-indigo-100 flex justify-between items-baseline">
+<span class="text-indigo-950 font-black text-base">400.00 <small class="text-xs font-bold text-slate-600">ج.م</small></span>
+<span class="text-[10px] text-emerald-700 font-bold">100 ج.م / حصة</span>
+</div>
+</label>
+<!-- Private Package Option (1000 EGP) -->
+<label class="border-2 border-slate-200 hover:border-slate-300 p-3.5 rounded-2xl cursor-pointer flex flex-col justify-between transition relative" id="pkgCard_private" onclick="selectPaymobPackage('private', 1000, 'باقة 4 محاضرات شهرياً (برايفت)')">
+<input class="hidden" name="paymobPkg" onchange="selectPaymobPackage('private', 1000, 'باقة 4 محاضرات شهرياً (برايفت)')" type="radio" value="private"/>
+<span class="absolute top-2.5 left-2.5 bg-amber-500 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full">VIP فردي</span>
+<div>
+<strong class="block text-slate-900 font-black text-sm">باقة برايفت VIP</strong>
+<span class="text-slate-500 text-[11px] block mt-0.5">4 محاضرات فردية خاصة (واحد لواحد)</span>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-baseline">
+<span class="text-slate-900 font-black text-base">1000.00 <small class="text-xs font-bold text-slate-600">ج.م</small></span>
+<span class="text-[10px] text-purple-700 font-bold">250 ج.م / حصة</span>
+</div>
+</label>
+</div>
+<!-- Payment Method Selection -->
+<div class="mb-4 text-xs">
+<label class="block font-bold text-slate-800 mb-1.5">اختر طريقة التحويل:</label>
+<div class="grid grid-cols-2 gap-2.5">
+<!-- InstaPay Tab -->
+<label class="pay-method-opt border-2 border-indigo-600 bg-indigo-50/70 p-3 rounded-2xl text-center cursor-pointer flex flex-col items-center gap-1 font-bold text-indigo-950 transition shadow-xs" id="payMethodTab_instapay">
+<input checked="" class="hidden" name="payMethod" onchange="updatePayMethodVisual(this)" type="radio" value="instapay"/>
+<span class="flex items-center gap-1 text-sm font-black">
+                            إنستا باي (InstaPay)
+                        </span>
+<span class="text-[10px] text-indigo-700 font-normal">تحويل بنكي فوري مجاني</span>
+</label>
+<!-- Vodafone Cash Tab -->
+<label class="pay-method-opt border-2 border-slate-200 hover:border-slate-300 p-3 rounded-2xl text-center cursor-pointer flex flex-col items-center gap-1 font-semibold text-slate-700 transition" id="payMethodTab_vodafone_cash">
+<input class="hidden" name="payMethod" onchange="updatePayMethodVisual(this)" type="radio" value="vodafone_cash"/>
+<span class="flex items-center gap-1 text-sm font-black">
+                            فودافون كاش
+                        </span>
+<span class="text-[10px] text-slate-500 font-normal">تحويل محفظة إلكترونية</span>
+</label>
+</div>
+</div>
+<!-- Transfer Account Details Display -->
+<!-- 1. InstaPay Details Box -->
+<div class="bg-indigo-50/90 border-2 border-indigo-200 rounded-2xl p-3.5 mb-3.5 text-xs space-y-2.5" id="instapayDetailsBox">
+<div class="flex items-center justify-between">
+<span class="font-black text-indigo-950 flex items-center gap-1.5 text-xs">
+                        بيانات التحويل عبر إنستا باي (InstaPay):
+                    </span>
+<span class="bg-indigo-700 text-white font-black text-[10px] px-2 py-0.5 rounded-full">حساب معتمد</span>
+</div>
+<div class="bg-white p-3 rounded-xl border border-indigo-100 space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-slate-500 font-medium">رقم الحساب:</span>
+<div class="flex items-center gap-2">
+<span class="font-mono font-black text-slate-900 text-sm tracking-wider" id="instapayAccNum">009348060001</span>
+<button class="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1" onclick="copyTransferText('009348060001', this)" type="button">
+<span>نسخ الحساب</span>
+</button>
+</div>
+</div>
+<div class="flex justify-between items-center pt-1.5 border-t border-slate-100">
+<span class="text-slate-500 font-medium">اسم البنك:</span>
+<strong class="text-slate-800 font-bold">First Abu Dhabi Bank Misr</strong>
+</div>
+<div class="flex justify-between items-center pt-1.5 border-t border-slate-100">
+<span class="text-slate-500 font-medium">اسم صاحب الحساب:</span>
+<strong class="text-indigo-950 font-black">TRAINER X FOR TRAINING</strong>
+</div>
+<div class="flex justify-between items-center pt-1.5 border-t border-slate-100">
+<span class="text-slate-500 font-medium">المبلغ المطلوب:</span>
+<strong class="text-emerald-700 font-black text-sm" id="instapayAmountDisplay">400.00 ج.م</strong>
+</div>
+</div>
+</div>
+<!-- 2. Vodafone Cash Details Box -->
+<div class="hidden bg-rose-50/90 border-2 border-rose-200 rounded-2xl p-3.5 mb-3.5 text-xs space-y-2.5" id="vodafoneDetailsBox">
+<div class="flex items-center justify-between">
+<span class="font-black text-rose-950 flex items-center gap-1.5 text-xs">
+                        بيانات التحويل عبر محفظة فودافون كاش:
+                    </span>
+<span class="bg-rose-600 text-white font-black text-[10px] px-2 py-0.5 rounded-full">محفظة كاش</span>
+</div>
+<div class="bg-white p-3 rounded-xl border border-rose-100 space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-slate-500 font-medium">رقم المحفظة:</span>
+<div class="flex items-center gap-2">
+<span class="font-mono font-black text-rose-700 text-base tracking-wider" id="vodafoneCashNum"></span>
+<button class="bg-rose-100 hover:bg-rose-200 text-rose-900 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1" onclick="copyTransferText('', this)" type="button">
+<span>نسخ الرقم</span>
+</button>
+</div>
+</div>
+<div class="flex justify-between items-center pt-1.5 border-t border-slate-100">
+<span class="text-slate-500 font-medium">المبلغ المطلوب تحويله:</span>
+<strong class="text-emerald-700 font-black text-sm" id="vodafoneAmountDisplay">400.00 ج.م</strong>
+</div>
+</div>
+</div>
+<!-- Step-by-Step Payment Notice -->
+<div class="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-3.5 mb-3.5 text-xs text-amber-950">
+<div class="flex items-start gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-amber-500 mt-1 shrink-0"></span>
+<div class="space-y-1 leading-relaxed">
+<strong class="font-black block text-amber-900 text-sm">تنبيه هام حول طريقة السداد:</strong>
+<p class="text-slate-700">السداد لا يتم بخصم إلكتروني مباشر من هذا الموقع، بل عبر <strong>التحويل المالي المباشر</strong> من هاتفك باتباع الخطوات التالية:</p>
+<ol class="list-decimal list-inside space-y-1 text-slate-800 font-medium pt-1">
+<li>انسخ رقم الحساب أو المحفظة الموضح أعلاه.</li>
+<li>افتح تطبيق <strong>إنستا باي</strong> أو محفظتك وحوّل المبلغ (<span class="font-bold text-emerald-800" id="howToAmount">400.00 ج.م</span>).</li>
+<li>التقط صورة (سكرين شوت) لإشعار نجاح التحويل.</li>
+<li>اضغط الزر الأخضر بالأسفل وأرسل الصورة عبر واتساب ليتم تفعيل وشحن الحصص فوراً.</li>
+</ol>
+</div>
+</div>
+</div>
+<!-- Primary Action: WhatsApp Direct Link -->
+<div class="space-y-2.5">
+<a class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 transform hover:scale-[1.01] text-center" href="#" id="btnSendWhatsAppTransfer" target="_blank">
+<span>إرسال صورة التحويل وتفعيل الحصص فوراً (واتساب)</span>
+</a>
+<!-- Secondary Action: Register Transfer Notice -->
+<button class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 rounded-xl border border-slate-200 transition flex items-center justify-center gap-2 cursor-pointer" id="btnPaymobSubmit" onclick="submitPaymobPayment()">
+<span id="btnPaymobSubmitText">تسجيل إشعار سداد (400.00 ج.م) - قيد المراجعة</span>
+</button>
+</div>
+<p class="text-[10px] text-center text-slate-400 mt-2 flex items-center justify-center gap-1">
+<span>لا يتم تفعيل الرصيد إلا بعد مراجعة صورة إشعار التحويل من قبل الإدارة</span>
+</p>
+</div>
+</div><div class="modal-overlay hidden" id="receiptModal">
+<div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-xs max-h-[92vh] overflow-y-auto">
+<div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-black text-xs">M</span>
+<h3 class="font-extrabold text-base text-slate-900">طلب سداد اشتراك وإشعار تحويل</h3>
+</div>
+<button class="text-slate-400 hover:text-slate-600 text-xl font-bold" onclick="closeReceiptModal()">×</button>
+</div>
+<!-- Pending Review Notice -->
+<div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3.5 text-amber-900 leading-relaxed text-[11px] flex items-start gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-amber-500 mt-1 shrink-0"></span>
+<div>
+<strong class="font-bold block text-amber-950">الطلب قيد المراجعة:</strong>
+<span>لتأكيد السداد وتفعيل الحصص في رصيدك فوراً، يرجى الضغط على الزر الأخضر بالأسفل وإرسال صورة إيصال التحويل (الاسكرين شوت) للإدارة عبر واتساب.</span>
+</div>
+</div>
+<div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2 mb-4 font-mono text-slate-700">
+<div class="flex justify-between">
+<span class="font-sans text-slate-500">رقم الطلب:</span>
+<strong class="text-slate-950 font-bold" id="receiptNumber">REQ-2026-PAY-8821</strong>
+</div>
+<div class="flex justify-between">
+<span class="font-sans text-slate-500">اسم الطالب:</span>
+<strong class="text-slate-950 font-bold font-sans" id="receiptStudentName">عمر أحمد</strong>
+</div>
+<div class="flex justify-between">
+<span class="font-sans text-slate-500">كود الطالب:</span>
+<strong class="text-slate-950" id="receiptStudentCode">ST1088</strong>
+</div>
+<div class="flex justify-between">
+<span class="font-sans text-slate-500">المسار التدريبي:</span>
+<strong class="text-slate-950 font-sans" id="receiptCourseName">مسار تحفيظ القرآن الكريم</strong>
+</div>
+<div class="flex justify-between">
+<span class="font-sans text-slate-500">باقة التجديد:</span>
+<strong class="text-blue-900 font-bold font-sans" id="receiptPackageName">باقة الـ 4 محاضرات شهرياً (جروب)</strong>
+</div>
+<div class="flex justify-between">
+<span class="font-sans text-slate-500">الحصص المطلوب شحنها:</span>
+<strong class="text-emerald-700 font-bold font-sans" id="receiptCreditsAdded">+4 حصص جديدة</strong>
+</div>
+<div class="flex justify-between">
+<span class="font-sans text-slate-500">المبلغ المطلوب:</span>
+<strong class="text-emerald-700 font-bold text-sm" id="receiptAmount">400.00 ج.م</strong>
+</div>
+<div class="flex justify-between">
+<span class="font-sans text-slate-500">تاريخ الطلب:</span>
+<span class="text-slate-600" id="receiptDate">2026-09-24</span>
+</div>
+<div class="flex justify-between pt-2 border-t border-slate-200">
+<span class="font-sans text-slate-500">حالة السداد:</span>
+<span class="bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded text-[10px] font-sans" id="receiptStatusBadge">قيد التحقق (بانتظار صورة التحويل)</span>
+</div>
+</div>
+<div class="space-y-2">
+<a class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md text-center" href="#" id="btnWhatsAppReceipt" target="_blank">
+<span>إرسال صورة التحويل وتأكيد التفعيل عبر WhatsApp</span>
+</a>
+<button class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl transition cursor-pointer" onclick="closeReceiptModal()">
+                    إغلاق
+                </button>
+</div>
+</div>
+</div><div class="modal-overlay hidden" id="studentSearchModal">
+<div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-200 text-xs max-h-[85vh] flex flex-col">
+<div class="flex justify-between items-center pb-3 border-b border-slate-100 flex-shrink-0">
+<div class="flex items-center gap-2">
+<div>
+<h3 class="font-black text-sm text-slate-900">بحث وتحديد طالب</h3>
+<p class="text-[11px] text-slate-500">اختر أي طالب لعرض صفحته وحضوره ورصيده فوراً</p>
+</div>
+</div>
+<button class="text-slate-400 hover:text-slate-600 text-2xl font-bold leading-none cursor-pointer" onclick="closeStudentSearchModal()">×</button>
+</div>
+<div class="py-3 flex-shrink-0">
+<input class="w-full bg-slate-50 border border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none" id="studentModalSearchInput" oninput="filterModalStudents(this.value)" placeholder="ابحث باسم الطالب أو الكود ST... أو المجموعة G..." type="text"/>
+</div>
+<div class="flex-1 overflow-y-auto space-y-1.5 pr-1 min-h-[220px] max-h-[50vh]" id="modalStudentsResultsList">
+<!-- Injected via JS -->
+</div>
+<div class="pt-3 border-t border-slate-100 flex justify-between items-center flex-shrink-0 text-xs">
+<span class="text-[11px] text-slate-400" id="studentSearchModalCount"></span>
+<button class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-1.5 rounded-xl transition cursor-pointer" onclick="closeStudentSearchModal()" type="button">إغلاق</button>
+</div>
+</div>
+</div><div class="modal-overlay video-modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/95 backdrop-blur-md" id="tafsirVideoModal" oncontextmenu="return false;">
+<div class="video-modal-container relative w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[96vh]">
+<!-- Top Bar -->
+<div class="video-top-bar flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3.5 bg-slate-900 border-b border-slate-800 text-white shrink-0 gap-2">
+<div class="min-w-0 flex-1">
+<h3 class="text-xs sm:text-sm font-black text-white truncate">المرئي للتفسير والتدبر - ملخص الشهر الأول</h3>
+<span class="text-[10px] sm:text-[11px] font-bold text-indigo-300 block mt-0.5 truncate" id="tafsirModalCohortTitle">فئة الطالب</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<button class="text-[11px] sm:text-xs text-amber-300 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 active:scale-95 px-2.5 sm:px-3 py-1.5 rounded-xl border border-amber-400/40 font-black transition flex items-center gap-1 cursor-pointer shadow-xs" onclick="requestVideoLandscape('tafsir')" title="مشاهدة بملء الشاشة بالعرض" type="button">
+<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+<span>تكبير بالعرض</span>
+</button>
+<button class="text-[11px] sm:text-xs text-slate-200 hover:text-white bg-slate-800 hover:bg-slate-700 active:scale-95 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-700 font-bold transition flex items-center gap-1 cursor-pointer" onclick="toggleRotateVideo('tafsir')" title="تدوير الفيديو للشاشة العريضة" type="button">
+<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+<span class="btn-rotate-indicator">تدوير</span>
+</button>
+<button class="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 active:scale-95 px-3 py-1.5 rounded-xl border border-slate-700 font-bold transition cursor-pointer" onclick="closeTafsirVideoModal()" type="button">
+                        إغلاق
+                    </button>
+</div>
+</div>
+<!-- Video Player Wrapper with Anti-Download & Anti-Popout Protection -->
+<div class="video-player-box relative w-full bg-black flex items-center justify-center aspect-video overflow-hidden select-none">
+<!-- Iframe embed -->
+<iframe allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock" allowfullscreen="true" class="w-full h-full border-0" id="tafsirVideoIframe" mozallowfullscreen="true" src="about:blank" webkitallowfullscreen="true">
+</iframe>
+<!-- Anti-Popout Transparent Overlay: Blocks clicking the Google Drive "Open in new tab" icon on top-right -->
+<div class="absolute top-0 right-0 w-24 h-16 pointer-events-auto bg-transparent z-10" title=""></div>
+</div>
+<!-- Bottom Protection Bar -->
+<div class="video-bottom-bar px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-900/90 border-t border-slate-800/80 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 shrink-0 gap-2">
+<span class="font-bold text-slate-300">💡 اضغط على (تكبير بالعرض) لمشاهدة الفيديو بالعرض ملء الشاشة</span>
+<span class="text-slate-500 hidden sm:inline">أكاديمية منير — مشغل العرض المحمي</span>
+</div>
+</div>
+</div><div class="modal-overlay video-modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/95 backdrop-blur-md" id="hadithVideoModal" oncontextmenu="return false;">
+<div class="video-modal-container relative w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[96vh]">
+<!-- Top Bar -->
+<div class="video-top-bar flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3.5 bg-slate-900 border-b border-slate-800 text-white shrink-0 gap-2">
+<div class="min-w-0 flex-1">
+<h3 class="text-xs sm:text-sm font-black text-white truncate">المرئي للحديث الشريف - ملخص الشهر الأول</h3>
+<span class="text-[10px] sm:text-[11px] font-bold text-teal-300 block mt-0.5 truncate" id="hadithModalCohortTitle">فئة الطالب</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<button class="text-[11px] sm:text-xs text-amber-300 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 active:scale-95 px-2.5 sm:px-3 py-1.5 rounded-xl border border-amber-400/40 font-black transition flex items-center gap-1 cursor-pointer shadow-xs" onclick="requestVideoLandscape('hadith')" title="مشاهدة بملء الشاشة بالعرض" type="button">
+<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+<span>تكبير بالعرض</span>
+</button>
+<button class="text-[11px] sm:text-xs text-slate-200 hover:text-white bg-slate-800 hover:bg-slate-700 active:scale-95 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-700 font-bold transition flex items-center gap-1 cursor-pointer" onclick="toggleRotateVideo('hadith')" title="تدوير الفيديو للشاشة العريضة" type="button">
+<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+<span class="btn-rotate-indicator">تدوير</span>
+</button>
+<button class="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 active:scale-95 px-3 py-1.5 rounded-xl border border-slate-700 font-bold transition cursor-pointer" onclick="closeHadithVideoModal()" type="button">
+                        إغلاق
+                    </button>
+</div>
+</div>
+<!-- Video Player Wrapper with Anti-Download & Anti-Popout Protection -->
+<div class="video-player-box relative w-full bg-black flex items-center justify-center aspect-video overflow-hidden select-none">
+<!-- Iframe embed -->
+<iframe allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock" allowfullscreen="true" class="w-full h-full border-0" id="hadithVideoIframe" mozallowfullscreen="true" src="about:blank" webkitallowfullscreen="true">
+</iframe>
+<!-- Anti-Popout Transparent Overlay: Blocks clicking the Google Drive "Open in new tab" icon on top-right -->
+<div class="absolute top-0 right-0 w-24 h-16 pointer-events-auto bg-transparent z-10" title=""></div>
+</div>
+<!-- Bottom Protection Bar -->
+<div class="video-bottom-bar px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-900/90 border-t border-slate-800/80 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 shrink-0 gap-2">
+<span class="font-bold text-slate-300">💡 اضغط على (تكبير بالعرض) لمشاهدة الفيديو بالعرض ملء الشاشة</span>
+<span class="text-slate-500 hidden sm:inline">أكاديمية منير — مشغل العرض المحمي</span>
+</div>
+</div>
+</div><div class="modal-overlay video-modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/95 backdrop-blur-md" id="tajweedVideoModal" oncontextmenu="return false;">
+<div class="video-modal-container relative w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[96vh]">
+<!-- Top Bar -->
+<div class="video-top-bar flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3.5 bg-slate-900 border-b border-slate-800 text-white shrink-0 gap-2">
+<div class="min-w-0 flex-1">
+<h3 class="text-xs sm:text-sm font-black text-white truncate">المرئي لأحكام التجويد ومخارج الحروف - ملخص الشهر الأول</h3>
+<span class="text-[10px] sm:text-[11px] font-bold text-amber-300 block mt-0.5 truncate" id="tajweedModalCohortTitle">فيديو موحد لجميع الطلاب والطالبات</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<button class="text-[11px] sm:text-xs text-amber-300 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 active:scale-95 px-2.5 sm:px-3 py-1.5 rounded-xl border border-amber-400/40 font-black transition flex items-center gap-1 cursor-pointer shadow-xs" onclick="requestVideoLandscape('tajweed')" title="مشاهدة بملء الشاشة بالعرض" type="button">
+<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+<span>تكبير بالعرض</span>
+</button>
+<button class="text-[11px] sm:text-xs text-slate-200 hover:text-white bg-slate-800 hover:bg-slate-700 active:scale-95 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-700 font-bold transition flex items-center gap-1 cursor-pointer" onclick="toggleRotateVideo('tajweed')" title="تدوير الفيديو للشاشة العريضة" type="button">
+<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+<span class="btn-rotate-indicator">تدوير</span>
+</button>
+<button class="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 active:scale-95 px-3 py-1.5 rounded-xl border border-slate-700 font-bold transition cursor-pointer" onclick="closeTajweedVideoModal()" type="button">
+                        إغلاق
+                    </button>
+</div>
+</div>
+<!-- Video Player Wrapper with Anti-Download & Anti-Popout Protection -->
+<div class="video-player-box relative w-full bg-black flex items-center justify-center aspect-video overflow-hidden select-none">
+<!-- Iframe embed -->
+<iframe allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock" allowfullscreen="true" class="w-full h-full border-0" id="tajweedVideoIframe" mozallowfullscreen="true" src="about:blank" webkitallowfullscreen="true">
+</iframe>
+<!-- Anti-Popout Transparent Overlay: Blocks clicking the Google Drive "Open in new tab" icon on top-right -->
+<div class="absolute top-0 right-0 w-24 h-16 pointer-events-auto bg-transparent z-10" title=""></div>
+</div>
+<!-- Bottom Protection Bar -->
+<div class="video-bottom-bar px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-900/90 border-t border-slate-800/80 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 shrink-0 gap-2">
+<span class="font-bold text-slate-300">💡 اضغط على (تكبير بالعرض) لمشاهدة الفيديو بالعرض ملء الشاشة</span>
+<span class="text-slate-500 hidden sm:inline">أكاديمية منير — مشغل العرض المحمي</span>
+</div>
+</div>
+</div>
+    </div>
+
+    <!-- CORE JAVASCRIPT MODULES -->
+    <script src="js/popup.js?v=20260915_fix4"></script>
+    <script src="js/meet_manager.js?v=20261027_clean_v1"></script>
+    <script src="js/student_genders.js?v=20260922_v1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase_client.js?v=20260923_v1"></script>
+    
+    
+    <script src="js/student_ledger.js?v=20261023_open_v2"></script>
+
+    <!-- CLIENT NAVIGATION & MOBILE DATA SYNC SCRIPT -->
+    <script>
+      (function() {
+        // Lucide icons initialization
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
+        // Master panel navigation
+        const panels = [...document.querySelectorAll('[data-panel]')];
+        const navButtons = [...document.querySelectorAll('.mn-nav [data-go]')];
+        const parents = {
+            room: 'live',
+            records: 'live',
+            course: 'schedule',
+            library: 'schedule',
+            media: 'schedule',
+            podcast: 'schedule',
+            results: 'tests',
+            certificates: 'tests',
+            packages: 'billing',
+            payment: 'billing',
+            pending: 'billing',
+            ledger: 'billing',
+            profile: 'live',
+            notifications: 'live',
+            support: 'live'
+        };
+
+        let currentPanel = 'live';
+
+        window.switchStudentPanel = function(target, content) {
+            currentPanel = target || 'live';
+            panels.forEach(p => {
+                p.hidden = (p.dataset.panel !== currentPanel);
+            });
+
+            const parentNav = parents[currentPanel] || currentPanel;
+            navButtons.forEach(btn => {
+                if (btn.dataset.go === parentNav) {
+                    btn.setAttribute('aria-current', 'page');
+                    btn.classList.add('mn-active');
+                } else {
+                    btn.removeAttribute('aria-current');
+                    btn.classList.remove('mn-active');
+                }
+            });
+
+            if (content && document.getElementById('mn-media-title')) {
+                document.getElementById('mn-media-title').textContent = content;
+                const vTitle = document.getElementById('mediaVideoTitle');
+                if (vTitle) vTitle.textContent = 'ملخص ' + content;
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        // Accordion disclosure for Hifz plan
+        const discBtn = document.getElementById('mn-details-toggle');
+        const detailsBox = document.getElementById('mn-details');
+        if (discBtn && detailsBox) {
+            let isOpen = false;
+            discBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                isOpen = !isOpen;
+                discBtn.setAttribute('aria-expanded', String(isOpen));
+                detailsBox.classList.toggle('open', isOpen);
+                detailsBox.inert = !isOpen;
+                const icon = discBtn.querySelector('[data-lucide="chevron-down"]');
+                if (icon) icon.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+        }
+
+        // Handle data-go clicks
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-go]');
+            if (btn) {
+                e.preventDefault();
+                const target = btn.dataset.go;
+                const content = btn.dataset.content;
+                window.switchStudentPanel(target, content);
+            }
+        });
+
+        // Join Meet handler
+        const joinBtn = document.getElementById('mn-join');
+        if (joinBtn) {
+            joinBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (typeof window.joinMeet === 'function') {
+                    const curCourse = (window.enrolledCoursesList && window.enrolledCoursesList[0]) || {};
+                    const meetUrl = curCourse.google_meet_url || curCourse.meet_url || '';
+                    window.joinMeet(curCourse.id || 1, meetUrl);
+                } else {
+                    window.switchStudentPanel('room');
+                }
+            });
+        }
+
+        // Fast room direct launcher
+        window.launchLiveRoomDirectly = function() {
+            const curCourse = (window.enrolledCoursesList && window.enrolledCoursesList[0]) || {};
+            const meetUrl = curCourse.google_meet_url || curCourse.meet_url || 'https://meet.google.com/che-nnub-mxf';
+            window.open(meetUrl, '_blank');
+        };
+
+        // Quiz opener by ID (1001, 1002, 1003)
+        window.openQuizById = function(quizId) {
+            if (typeof window.openQuizModal === 'function') {
+                window.openQuizModal(quizId);
+            } else {
+                alert('جارٍ تجهيز أسئلة الاختبار...');
+            }
+        };
+
+        // WhatsApp direct renewal notice
+        window.sendWhatsAppRenewalNotice = function() {
+            const code = document.getElementById('studentCode')?.innerText || 'ST0000';
+            const name = document.getElementById('studentName')?.innerText || 'طالب';
+            const pkg = document.querySelector('input[name="mn-package"]:checked')?.value || 'group';
+            const pkgLabel = pkg === 'private' ? 'باقة فردية خاصة (1000 ج.م)' : 'باقة مجموعة منتظمة (400 ج.م)';
+            const text = encodeURIComponent(`السلام عليكم، أرغب في تجديد الاشتراك بأكاديمية منير:\nكود الطالب: ${code}\nالاسم: ${name}\nالباقة المختارة: ${pkgLabel}`);
+            window.open(`https://wa.me/201018867451?text=${text}`, '_blank');
+        };
+
+        // WhatsApp support direct
+        window.openWhatsAppDirectSupport = function() {
+            const code = document.getElementById('studentCode')?.innerText || 'ST0000';
+            const name = document.getElementById('studentName')?.innerText || 'طالب';
+            const text = encodeURIComponent(`السلام عليكم، أحتاج مساعدة في منصة أكاديمية منير:\nكود الطالب: ${code}\nالاسم: ${name}`);
+            window.open(`https://wa.me/201018867451?text=${text}`, '_blank');
+        };
+
+        // Mobile Ticket submit handler
+        window.handleMobileTicketSubmit = async function() {
+            const cat = document.getElementById('ticketCategory')?.value;
+            const subj = document.getElementById('ticketSubject')?.value;
+            const msg = document.getElementById('ticketMessage')?.value;
+            const notice = document.getElementById('ticketSuccessNotice');
+
+            if (!msg || !msg.trim()) {
+                if (window.MonirPopup) window.MonirPopup.alert('يرجى كتابة تفاصيل الطلب أولاً', 'تنبيه', 'warning');
+                else alert('يرجى كتابة تفاصيل الطلب');
+                return;
+            }
+
+            if (typeof window.submitSupportTicket === 'function') {
+                await window.submitSupportTicket();
+            }
+
+            if (notice) {
+                notice.classList.remove('hidden');
+                setTimeout(() => notice.classList.add('hidden'), 5000);
+            }
+            const msgEl = document.getElementById('ticketMessage');
+            if (msgEl) msgEl.value = '';
+            const subjEl = document.getElementById('ticketSubject');
+            if (subjEl) subjEl.value = '';
+        };
+
+        // Sync helper to mirror data across mobile elements
+        function syncMobileDisplay() {
+            const name = document.getElementById('studentName')?.innerText;
+            if (name && name !== '---') {
+                document.querySelectorAll('.studentNameSpan').forEach(el => el.textContent = name.split(' ')[0]);
+                const initials = name.trim().charAt(0);
+                const initEl = document.getElementById('topUserInitials');
+                if (initEl) initEl.textContent = initials;
+                const profInit = document.getElementById('profileUserInitials');
+                if (profInit) profInit.textContent = initials;
+            }
+
+            const rem = document.getElementById('statRemainingCredits')?.innerText;
+            if (rem && rem !== '--') {
+                const billRem = document.getElementById('billingRemainingCredits');
+                if (billRem) billRem.textContent = rem;
+                const ledgRem = document.getElementById('ledgerRemainingCredits');
+                if (ledgRem) ledgRem.textContent = rem;
+            }
+
+            const pres = document.getElementById('presentCount')?.innerText;
+            if (pres && pres !== '--') {
+                const ledgAtt = document.getElementById('ledgerAttendedCount');
+                if (ledgAtt) ledgAtt.textContent = pres;
+            }
+
+            // Sync active course info
+            if (window.enrolledCoursesList && window.enrolledCoursesList.length > 0) {
+                const c = window.enrolledCoursesList[0];
+                const titleEl = document.getElementById('liveCourseTitle');
+                if (titleEl && c.course_name) titleEl.textContent = c.course_name;
+                const tNameEl = document.getElementById('liveTeacherName');
+                if (tNameEl && c.teacher_name) tNameEl.textContent = 'مع الشيخ ' + c.teacher_name;
+                const sDaysEl = document.getElementById('liveScheduleTime');
+                if (sDaysEl && c.schedule_days) sDaysEl.textContent = c.schedule_days + ' · بتوقيت القاهرة';
+
+                const crsT = document.getElementById('courseTeacherName');
+                if (crsT && c.teacher_name) crsT.textContent = 'الشيخ ' + c.teacher_name;
+                const crsD = document.getElementById('courseScheduleDays');
+                if (crsD && c.schedule_days) crsD.textContent = c.schedule_days;
+            }
+        }
+
+        // Run sync on load and after profile loads
+        window.addEventListener('load', () => {
+            setTimeout(syncMobileDisplay, 500);
+            setTimeout(syncMobileDisplay, 1500);
+        });
+        setInterval(syncMobileDisplay, 3000);
+
+      })();
+    </script>
+</body>
+</html>
