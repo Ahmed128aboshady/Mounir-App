@@ -1,5 +1,6 @@
 """Isolated integration tests. All cloud I/O is replaced; never writes production."""
-import copy,importlib.util,json,pathlib,threading,urllib.request,urllib.error,http.cookiejar,unittest,sys,time
+import copy,importlib.util,json,pathlib,threading,urllib.request,urllib.error,http.cookiejar,unittest,sys,time,tempfile
+from unittest.mock import patch
 ROOT=pathlib.Path(__file__).resolve().parents[1]/'local_live'
 spec=importlib.util.spec_from_file_location('mounir_test_server',ROOT/'local_live_server.py')
 app=importlib.util.module_from_spec(spec);spec.loader.exec_module(app)
@@ -177,6 +178,20 @@ class Tests(unittest.TestCase):
  def test_runtime_and_configuration_files_are_not_public(self):
   for path in ['/.env','/.runtime/operations.sqlite3','/local_live/local_live_server.py']:
    self.assertEqual(self.call(path)[0],404)
+
+class HostingTests(unittest.TestCase):
+ def test_production_requires_valid_origin_and_mounted_writable_journal(self):
+  with tempfile.TemporaryDirectory() as folder:
+   journal=pathlib.Path(folder)/'operations.sqlite3'
+   with patch.multiple(app,URL='https://fixture.invalid',KEY='fixture',PRODUCTION=True,PUBLIC_ORIGIN='https://academy.example',REQUIRE_PERSISTENT_DISK=True,STATE_DIR=pathlib.Path(folder),AUDIT_DB=journal):
+    with patch.object(app.os.path,'ismount',return_value=False):
+     with self.assertRaisesRegex(SystemExit,'persistent disk'):app.validate_runtime()
+    self.assertFalse(journal.exists())
+    with patch.object(app.os.path,'ismount',return_value=True):
+     app.validate_runtime()
+     self.assertTrue(journal.exists())
+     with patch.object(app,'PUBLIC_ORIGIN','https://academy.example/path'):
+      with self.assertRaisesRegex(SystemExit,'exact HTTPS origin'):app.validate_runtime()
 
 if __name__=='__main__':
  if '--serve-fixture' in sys.argv:

@@ -1,0 +1,30 @@
+# Live academy data. Provision only after approval of compute + disk charges.
+# Enter the existing Supabase values privately in Render, never in this file.
+services:
+  - type: web
+    name: mounir-academy-live
+    runtime: python
+    repo: https://github.com/Ahmed128aboshady/Mounir-App
+    branch: Ahmed-Coding
+    region: frankfurt
+    plan: 0.5c-512mb
+    numInstances: 1
+    buildCommand: pip install -r requirements.txt
+    startCommand: python local_live/local_live_server.py
+    healthCheckPath: /api/health
+    autoDeployTrigger: "off"
+    disk:
+      name: mounir-operations
+      mountPath: /var/data/mounir
+      sizeGB: 1
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATA_DIR
+        value: /var/data/mounir
+      - key: REQUIRE_PERSISTENT_DISK
+        value: "true"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false

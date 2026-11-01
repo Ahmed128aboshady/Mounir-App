@@ -5,6 +5,7 @@ Never imports main.py: its startup seeds/migrates the separate SQLite database.
 """
 import argparse
 import collections
+from contextlib import closing
 import datetime as dt
 import hashlib
 import hmac
@@ -36,7 +37,8 @@ TABLES = {'students','enrollments','teachers','attendance','support_tickets','pa
 URL = os.environ.get('SUPABASE_URL','').rstrip('/')
 KEY = os.environ.get('SUPABASE_ANON_KEY','')
 PRODUCTION = os.environ.get('APP_ENV','development') == 'production'
-PUBLIC_ORIGIN = os.environ.get('PUBLIC_ORIGIN','').rstrip('/')
+PUBLIC_ORIGIN = (os.environ.get('PUBLIC_ORIGIN') or os.environ.get('RENDER_EXTERNAL_URL','')).rstrip('/')
+REQUIRE_PERSISTENT_DISK = os.environ.get('REQUIRE_PERSISTENT_DISK','false').lower() == 'true'
 STATE_DIR = pathlib.Path(os.environ.get('DATA_DIR',str(ROOT/'.runtime'))).resolve()
 STATE_DIR.mkdir(parents=True,exist_ok=True)
 AUDIT_DB = STATE_DIR/'operations.sqlite3'
@@ -735,12 +737,21 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200,source,'text/javascript; charset=utf-8')
         return self.send(200,target.read_bytes(),mimetypes.guess_type(target.name)[0] or 'application/octet-stream')
 
-def main():
-    p=argparse.ArgumentParser();p.add_argument('--port',type=int,default=int(os.environ.get('PORT','8010')));args=p.parse_args()
+def validate_runtime():
     if not FRONT.exists() or not URL or not KEY:raise SystemExit('Set SUPABASE_URL and SUPABASE_ANON_KEY in the server environment before starting.')
     if not URL.startswith('https://'):raise SystemExit('SUPABASE_URL must use HTTPS.')
     origin=urllib.parse.urlsplit(PUBLIC_ORIGIN)
     if PRODUCTION and (origin.scheme!='https' or not origin.netloc or origin.path or origin.query or origin.fragment or origin.username):raise SystemExit('Production requires PUBLIC_ORIGIN as the exact HTTPS origin, without a path.')
+    if REQUIRE_PERSISTENT_DISK and not os.path.ismount(STATE_DIR):
+        raise SystemExit('DATA_DIR must be the mounted persistent disk; refusing ephemeral operation storage.')
+    # Fail before accepting requests if the operation journal cannot be written.
+    with closing(sqlite3.connect(AUDIT_DB)) as db:
+        with db:
+            db.execute('CREATE TABLE IF NOT EXISTS operations (key TEXT PRIMARY KEY, fingerprint TEXT, state TEXT, response TEXT)')
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--port',type=int,default=int(os.environ.get('PORT','8010')));args=p.parse_args()
+    validate_runtime()
     bind='0.0.0.0' if PRODUCTION else '127.0.0.1'
     server=ThreadingHTTPServer((bind,args.port),Handler)
     print('Mounir Academy ready on port '+str(args.port),flush=True)
